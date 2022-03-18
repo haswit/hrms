@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hrms_app/camera.dart';
 import 'home.dart';
 import 'package:get/get.dart';
 
@@ -91,8 +92,12 @@ class Login extends StatelessWidget {
                           height: 40,
                           width: double.infinity,
                           child: ElevatedButton(
-                              onPressed: () {
-                                Get.to(() => (Home()));
+                              onPressed: () async {
+                                Get.to(() => (Home(
+                                      center_x: 17.39033478756686,
+                                      center_y: 78.4422241144142,
+                                      locationRadius: 200.0,
+                                    )));
                               },
                               child: Text(
                                 "Continue",

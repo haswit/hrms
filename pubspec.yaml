@@ -37,6 +37,14 @@ dependencies:
   google_maps_flutter: ^2.1.2
   location: ^4.3.0
   get: ^4.6.1
+  maps_toolkit: ^2.0.0
+  image_picker: ^0.8.4+11
+  camera: ^0.9.4+16
+
+
+  
+  
+
 
 
 

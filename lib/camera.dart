@@ -1,0 +1,121 @@
+import 'dart:io';
+import 'package:get/get.dart';
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+import 'image_preview.dart';
+
+class CameraPage extends StatefulWidget {
+  final List<CameraDescription>? cameras;
+  const CameraPage({this.cameras, Key? key}) : super(key: key);
+
+  @override
+  _CameraPageState createState() => _CameraPageState();
+}
+
+class _CameraPageState extends State<CameraPage> {
+  late CameraController controller;
+  XFile? pictureFile;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = CameraController(
+      widget.cameras![1],
+      ResolutionPreset.max,
+    );
+    controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!controller.value.isInitialized) {
+      return const SizedBox(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Capture Image"),
+          backgroundColor: Color.fromARGB(255, 36, 14, 97),
+        ),
+        body: Column(
+          children: [
+            SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8,
+                width: MediaQuery.of(context).size.width,
+                child: CameraPreview(controller)),
+            SizedBox(
+              height: 20,
+            ),
+            InkWell(
+              onTap: () async {
+                pictureFile = await controller.takePicture();
+                setState(() {});
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => picture(
+                            pictureFile: pictureFile,
+                          )),
+                );
+              },
+              child: SingleChildScrollView(
+                child: Container(
+                  child: const Center(
+                      child: Text(
+                    "",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  )),
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    border: Border.all(
+                      color: Colors.white30,
+                      width: 8,
+                    ),
+                    borderRadius: BorderRadius.circular(120),
+                  ),
+                ),
+              ),
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(0),
+            //   child: ElevatedButton(
+            //     onPressed: () async {
+            //       pictureFile = await controller.takePicture();
+            //       setState(() {});
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => picture(pictureFile: pictureFile,)
+            //         ),
+            //       );
+            //     },
+            //     child: const Text('Capture Image'),
+            //   ),
+            // ),
+            // if (pictureFile != null) Image.file(File(pictureFile!.path))
+          ],
+        ),
+      ),
+    );
+  }
+}
