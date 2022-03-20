@@ -27,7 +27,7 @@ class picture extends StatelessWidget {
                 ),
                 Center(
                   child: Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: EdgeInsets.only(left: 100, top: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,

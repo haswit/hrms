@@ -94,8 +94,8 @@ class Login extends StatelessWidget {
                           child: ElevatedButton(
                               onPressed: () async {
                                 Get.to(() => (Home(
-                                      center_x: 17.39033478756686,
-                                      center_y: 78.4422241144142,
+                                      center_x: 17.475950,
+                                      center_y: 78.362850,
                                       locationRadius: 200.0,
                                     )));
                               },

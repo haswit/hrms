@@ -98,7 +98,7 @@ class _HomeState extends State<Home> {
             fillColor: Color.fromARGB(61, 33, 149, 243),
             circleId: CircleId("one"),
             center: map_circle,
-            radius: 200.0,
+            radius: 400.0,
             strokeColor: Color.fromARGB(0, 33, 149, 243)),
       ]);
     });
