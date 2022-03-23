@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:maps_toolkit/maps_toolkit.dart' as tk;
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'camera.dart';
 import 'package:camera/camera.dart';
+import 'login.dart';
 
 class Home extends StatefulWidget {
 // /  final center_x = 17.391911;
@@ -36,7 +38,7 @@ class _HomeState extends State<Home> {
     this._locationRadius = _locationRadius;
     this._center = LatLng(center_x, center_y);
 
-    map_circle = LatLng(_center_x, 78.442633);
+    map_circle = LatLng(_center_x, _center_y);
   }
 
   Location currentLocation = Location();
@@ -75,18 +77,29 @@ class _HomeState extends State<Home> {
           InLoginZone = true;
         });
       } else {
+        //NotifyUser("Please move into Login zone to enter the attendance");
         InLoginZone = false;
       }
 
       setState(() {
-        // _markers.add(Marker(
-        //     markerId: MarkerId('Home'),
-        //     position: LatLng(loc.latitude ?? 0.0, loc.longitude ?? 0.0)));
+        _markers.add(Marker(
+            markerId: MarkerId('Office'),
+            position: LatLng(_center_x ?? 0.0, _center_x ?? 0.0)));
       });
     });
   }
 
   late Set<Circle> circles;
+
+  NotifyUser(title) {
+    Get.snackbar(
+      title,
+      "",
+      icon: Icon(Icons.info, color: Colors.white),
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -95,10 +108,16 @@ class _HomeState extends State<Home> {
       getLocation();
       circles = Set.from([
         Circle(
-            fillColor: Color.fromARGB(61, 33, 149, 243),
+            fillColor: Color.fromARGB(57, 4, 245, 16),
             circleId: CircleId("one"),
             center: map_circle,
-            radius: 400.0,
+            radius: 600.0,
+            strokeColor: Color.fromARGB(0, 33, 149, 243)),
+        Circle(
+            fillColor: Color.fromARGB(136, 245, 133, 4),
+            circleId: CircleId("one"),
+            center: map_circle,
+            radius: 200.0,
             strokeColor: Color.fromARGB(0, 33, 149, 243)),
       ]);
     });
@@ -120,9 +139,11 @@ class _HomeState extends State<Home> {
               actions: [
                 Padding(
                   padding: const EdgeInsets.only(right: 15.0),
-                  child: Icon(
-                    Icons.logout_sharp,
-                    size: 28,
+                  child: IconButton(
+                    onPressed: () {
+                      Get.to(() => (Login()));
+                    },
+                    icon: Icon(Icons.logout_sharp, size: 28),
                   ),
                 )
               ],
@@ -137,6 +158,29 @@ class _HomeState extends State<Home> {
                 margin: EdgeInsets.only(top: 10),
                 padding: EdgeInsets.all(10),
                 child: Column(children: [
+                  Visibility(
+                    visible: InLoginZone ? false : true,
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      padding: EdgeInsets.all(15),
+                      color: Color.fromARGB(82, 244, 132, 3),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Icon(Icons.info),
+                          ),
+                          Text(
+                            "Please move into login zone to enter the attendance",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 7, 7, 7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   Container(
                     padding: EdgeInsets.all(3),
                     child: Row(
@@ -183,11 +227,45 @@ class _HomeState extends State<Home> {
                                       style: TextStyle(fontSize: 25)))),
                         ]),
                   ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(right: 10, left: 20),
+                            decoration: BoxDecoration(
+                                color: Color.fromARGB(131, 244, 132, 3),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            height: 20,
+                            width: 20,
+                          ),
+                          Text("Login zone"),
+                          SizedBox(
+                            width: 20,
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(right: 10, left: 20),
+                            decoration: BoxDecoration(
+                                color: Color.fromARGB(167, 27, 202, 65),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            height: 20,
+                            width: 20,
+                          ),
+                          Text("Office zone")
+                        ],
+                      )
+                    ],
+                  ),
                   Container(
                     margin: EdgeInsets.only(top: 10),
                     height: 680,
                     child: GoogleMap(
-                        minMaxZoomPreference: MinMaxZoomPreference(17, 100),
+                        minMaxZoomPreference: MinMaxZoomPreference(15, 1000),
                         zoomControlsEnabled: true,
                         myLocationEnabled: true,
                         zoomGesturesEnabled: true,

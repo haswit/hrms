@@ -45,8 +45,14 @@
 	<false/>
 
 	<key>NSCameraUsageDescription</key>
-<string>Can I use the camera please?</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>Can I use the mic please?</string>
+	<string>Can I use the camera please?</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Can I use the mic please?</string>
+
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ar</string>
+	</array>
 </dict>
 </plist>
