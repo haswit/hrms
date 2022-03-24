@@ -4,10 +4,20 @@ import 'login.dart';
 import 'package:get/get.dart';
 import 'uploadtest.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'settings.dart';
+import 'sos.dart';
+import 'biometric.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  runApp(EasyLocalization(
+    supportedLocales: [Locale('en', 'US'), Locale('ar', 'UAE')],
+    path: 'assets/translations',
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -17,15 +27,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'APP',
-      localizationsDelegates: [
-      GlobalMaterialLocalizations.delegate,
-      GlobalwidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-      ],
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       home: MyHomePage(title: 'APP'),
     );
   }
@@ -49,6 +58,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child: Scaffold(body: Login()));
+    return SafeArea(child: Scaffold(body: Settings()));
   }
 }

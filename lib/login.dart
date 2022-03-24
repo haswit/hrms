@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hrms_app/camera.dart';
+import 'package:hrms_app/homeScreen.dart';
 import 'home.dart';
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:ui';
+import 'services/auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -14,12 +18,62 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
+  late final prefs;
+  var cin = "";
+  late final String email;
+
+  intSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+
+    var _cin = prefs.getString('cin');
+
+    if (_cin != null) {
+      setState(() {
+        cin = _cin;
+      });
+      // BioAuth();
+    }
+  }
 
   var _passwordVisible = false;
 
   @override
   void initState() {
     _passwordVisible = false;
+    setState(() {
+      intSharedPrefs();
+    });
+  }
+
+  BioAuth() async {
+    bool isAuthenticated = await AuthService.authenticateUser();
+    if (isAuthenticated) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Home(
+                  center_x: 17.476297,
+                  center_y: 78.361237,
+                  locationRadius: 200.0,
+                )),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Authentication failed.'),
+        ),
+      );
+    }
+  }
+
+  AuthUser() async {
+    await prefs.setString('cin', '123456456');
+
+    Get.to(() => (Home(
+          center_x: 17.476297,
+          center_y: 78.361237,
+          locationRadius: 200.0,
+        )));
   }
 
   @override
@@ -38,7 +92,7 @@ class _LoginState extends State<Login> {
           children: [
             Container(
               height: MediaQuery.of(context).size.height * 0.96,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/media/bg2.jpg"),
                   fit: BoxFit.cover,
@@ -48,7 +102,7 @@ class _LoginState extends State<Login> {
                 child: Form(
                   key: _formKey,
                   child: Padding(
-                    padding: EdgeInsets.only(top: 180, right: 20, left: 20),
+                    padding: EdgeInsets.only(top: 150, right: 20, left: 20),
                     child: Container(
                         width: 400,
                         child: Column(
@@ -56,11 +110,12 @@ class _LoginState extends State<Login> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(left: 18.0),
+                                padding: const EdgeInsets.only(
+                                    left: 18.0, right: 18.0),
                                 child: Text(
                                   'Sign In',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.blue,
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Calistoga',
@@ -194,17 +249,7 @@ class _LoginState extends State<Login> {
                                                       height: 50.0,
                                                       child: RaisedButton(
                                                         onPressed: () {
-                                                          print(
-                                                              'Clicked*********************************************************--------------------------------------------------------');
-
-                                                          Get.to(() => (Home(
-                                                                center_x:
-                                                                    17.426167,
-                                                                center_y:
-                                                                    78.437775,
-                                                                locationRadius:
-                                                                    200.0,
-                                                              )));
+                                                          AuthUser();
                                                         },
                                                         shape: RoundedRectangleBorder(
                                                             borderRadius:
@@ -259,9 +304,69 @@ class _LoginState extends State<Login> {
                                                         ),
                                                       ),
                                                     ),
+                                                    SizedBox(height: 50),
+                                                    Visibility(
+                                                      visible: cin != ""
+                                                          ? true
+                                                          : false,
+                                                      child: SizedBox(
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            BioAuth();
+                                                          },
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(5),
+                                                            backgroundColor:
+                                                                Color.fromARGB(
+                                                                    0,
+                                                                    33,
+                                                                    149,
+                                                                    243),
+                                                            shadowColor:
+                                                                const Color(
+                                                                    0xFF323247),
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: const [
+                                                              Icon(
+                                                                Icons
+                                                                    .fingerprint,
+                                                                color: Colors
+                                                                    .white,
+                                                                size: 70,
+                                                              ),
+                                                              Text(
+                                                                '',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 15,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  wordSpacing:
+                                                                      1.2,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
                                                   ],
                                                 ),
-                                              )
+                                              ),
                                             ],
                                           ),
                                         ),

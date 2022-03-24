@@ -1,12 +1,15 @@
 import 'dart:ui';
+import 'package:hrms_app/settings.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as tk;
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Trans;
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'camera.dart';
 import 'package:camera/camera.dart';
 import 'login.dart';
+import 'package:easy_localization/easy_localization.dart' as Loc;
 
 class Home extends StatefulWidget {
 // /  final center_x = 17.391911;
@@ -132,9 +135,22 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    //context.locale = Locale('ar', 'UAE');
+
     return SafeArea(
         child: Scaffold(
-            drawer: Drawer(),
+            drawer: Drawer(
+              child: ListView(
+                children: [
+                  ListTile(
+                    onTap: () {
+                      Get.to(() => (Settings()));
+                    },
+                    title: Text("Setting"),
+                  )
+                ],
+              ),
+            ),
             appBar: AppBar(
               actions: [
                 Padding(
@@ -162,22 +178,24 @@ class _HomeState extends State<Home> {
                     visible: InLoginZone ? false : true,
                     child: Container(
                       margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.all(15),
+                      padding: EdgeInsets.all(5),
                       color: Color.fromARGB(82, 244, 132, 3),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Icon(Icons.info),
-                          ),
-                          Text(
-                            "Please move into login zone to enter the attendance",
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 7, 7, 7),
+                      child: SingleChildScrollView(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Icon(Icons.info),
                             ),
-                          ),
-                        ],
+                            Text(
+                              "warning".tr().toString(),
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 7, 7, 7),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -195,8 +213,16 @@ class _HomeState extends State<Home> {
                                       primary:
                                           Color.fromARGB(221, 27, 202, 65)),
                                   onPressed: InLoginZone
-                                      ? () {
-                                          Get.to(() => (CameraPage));
+                                      ? () async {
+                                          await availableCameras()
+                                              .then((value) => Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CameraPage(
+                                                      cameras: value,
+                                                    ),
+                                                  )));
                                         }
                                       : null,
                                   child: Text(
@@ -210,7 +236,7 @@ class _HomeState extends State<Home> {
                                   style: ElevatedButton.styleFrom(
                                       primary:
                                           Color.fromARGB(226, 244, 67, 54)),
-                                  onPressed: InLoginZone
+                                  onPressed: 1 == 2 //InLoginZone
                                       ? () async {
                                           await availableCameras()
                                               .then((value) => Navigator.push(
