@@ -1,19 +1,36 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'login.dart';
-import 'package:get/get.dart';
 import 'uploadtest.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'settings.dart';
 import 'sos.dart';
 import 'biometric.dart';
+import 'gps_alert.dart';
+import 'services/request_location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'notificationspage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
+  AwesomeNotifications().initialize(null, // icon for your app notification
+      [
+        NotificationChannel(
+            channelKey: 'key1',
+            channelName: 'HRMS APP',
+            channelDescription: "Notification example",
+            defaultColor: Color(0XFF9050DD),
+            ledColor: Colors.white,
+            playSound: true,
+            enableLights: true,
+            enableVibration: true)
+      ]);
   runApp(EasyLocalization(
+    fallbackLocale: Locale('ar', 'UAE'),
     supportedLocales: [Locale('en', 'US'), Locale('ar', 'UAE')],
     path: 'assets/translations',
     child: MyApp(),
@@ -21,12 +38,12 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'APP',
       theme: ThemeData(
@@ -58,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child: Scaffold(body: Settings()));
+    return SafeArea(
+        child: Scaffold(body: Container(child: Center(child: Settings()))));
   }
 }

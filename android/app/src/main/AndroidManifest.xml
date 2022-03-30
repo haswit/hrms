@@ -2,9 +2,9 @@
     package="com.example.hrms_app">
    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
    <application
-        android:label="hrms_app"
+        android:label="HRMS App"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
 
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyCYN6YXuCbg2bQYKcmP6So4csr8WDGNLhE"/>

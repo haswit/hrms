@@ -1,8 +1,10 @@
 import 'dart:ui';
+import 'package:hrms_app/gps_alert.dart';
 import 'package:hrms_app/settings.dart';
+import 'package:hrms_app/sos.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as tk;
-import 'package:get/get.dart' hide Trans;
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -10,6 +12,7 @@ import 'camera.dart';
 import 'package:camera/camera.dart';
 import 'login.dart';
 import 'package:easy_localization/easy_localization.dart' as Loc;
+import 'notifications.dart';
 
 class Home extends StatefulWidget {
 // /  final center_x = 17.391911;
@@ -45,6 +48,9 @@ class _HomeState extends State<Home> {
   }
 
   Location currentLocation = Location();
+
+  var _serviceEnabled;
+  var _permissionGranted;
   late GoogleMapController mapController;
   double _mapZoom = 1.0;
 
@@ -52,14 +58,55 @@ class _HomeState extends State<Home> {
   double h = 1.0;
   var _cameraPosition;
   Set<Marker> _markers = {};
+  late final prefs;
+
+  intSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+
+    // BioAuth();
+  }
+
+  void logout(context) async {
+    await prefs.setString('logged_in', "false");
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Login()),
+    );
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
 
   void getLocation() async {
+    // currentLocation.enableBackgroundMode(enable: true);
+    _serviceEnabled = await currentLocation.serviceEnabled();
+
+    if (!_serviceEnabled) {
+      _serviceEnabled = await currentLocation.requestService();
+
+      if (!_serviceEnabled) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => GpsAlert()),
+        );
+      }
+    }
+
+    _permissionGranted = await currentLocation.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await currentLocation.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => GpsAlert()),
+        );
+      }
+    }
+
     var location = await currentLocation.getLocation();
-    currentLocation.onLocationChanged.listen((LocationData loc) {
+
+    currentLocation.onLocationChanged.listen((LocationData loc) async {
       mapController
           .animateCamera(CameraUpdate.newCameraPosition(new CameraPosition(
         target: LatLng(loc.latitude ?? 0.0, loc.longitude ?? 0.0),
@@ -94,18 +141,58 @@ class _HomeState extends State<Home> {
 
   late Set<Circle> circles;
 
-  NotifyUser(title) {
-    Get.snackbar(
-      title,
-      "",
-      icon: Icon(Icons.info, color: Colors.white),
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
+  // NotifyUser(String? title) {
+  //   const snackBar = SnackBar(
+  //     content: Text(title),
+  //   );
+
+// Find the ScaffoldMessenger in the widget tree
+// and use it to show a SnackBar.
+  //ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //}
 
   @override
   void initState() {
     super.initState();
+    intSharedPrefs();
+
+    AwesomeNotifications().isNotificationAllowed().then(
+      (isAllowed) {
+        if (!isAllowed) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Allow Notifications'),
+              content: Text('Our app would like to send you notifications'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Don\'t Allow',
+                    style: TextStyle(color: Colors.grey, fontSize: 18),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => AwesomeNotifications()
+                      .requestPermissionToSendNotifications()
+                      .then((_) => Navigator.pop(context)),
+                  child: Text(
+                    'Allow',
+                    style: TextStyle(
+                      color: Colors.teal,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+    );
 
     setState(() {
       getLocation();
@@ -143,10 +230,29 @@ class _HomeState extends State<Home> {
               child: ListView(
                 children: [
                   ListTile(
+                    title: Text("Notifications"),
                     onTap: () {
-                      Get.to(() => (Settings()));
+                      createNotification(
+                          "Notification Title", "Notification Body");
+                    },
+                  ),
+                  ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Settings()),
+                      );
                     },
                     title: Text("Setting"),
+                  ),
+                  ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Sos()),
+                      );
+                    },
+                    title: Text("SOS"),
                   )
                 ],
               ),
@@ -156,8 +262,8 @@ class _HomeState extends State<Home> {
                 Padding(
                   padding: const EdgeInsets.only(right: 15.0),
                   child: IconButton(
-                    onPressed: () {
-                      Get.to(() => (Login()));
+                    onPressed: () async {
+                      logout(context);
                     },
                     icon: Icon(Icons.logout_sharp, size: 28),
                   ),

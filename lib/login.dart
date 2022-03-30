@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hrms_app/camera.dart';
+import 'package:hrms_app/gps_alert.dart';
 import 'package:hrms_app/homeScreen.dart';
 import 'home.dart';
-import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:ui';
 import 'services/auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'services/request_location.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -21,6 +22,15 @@ class _LoginState extends State<Login> {
   late final prefs;
   var cin = "";
   late final String email;
+
+  var image1 = Image.asset("assets/media/bg2.jpg");
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    precacheImage(image1.image, context);
+  }
 
   intSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -48,15 +58,26 @@ class _LoginState extends State<Login> {
   BioAuth() async {
     bool isAuthenticated = await AuthService.authenticateUser();
     if (isAuthenticated) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => Home(
-                  center_x: 17.476297,
-                  center_y: 78.361237,
-                  locationRadius: 200.0,
-                )),
-      );
+      Future<bool> location = request_location();
+
+      if (location == false) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => GpsAlert()),
+        );
+      } else {
+        await prefs.setString('logged_in', "true");
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Home(
+                    center_x: 37.4220656,
+                    center_y: 122.0862784,
+                    locationRadius: 200.0,
+                  )),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -69,11 +90,17 @@ class _LoginState extends State<Login> {
   AuthUser() async {
     await prefs.setString('cin', '123456456');
 
-    Get.to(() => (Home(
-          center_x: 17.476297,
-          center_y: 78.361237,
-          locationRadius: 200.0,
-        )));
+    await prefs.setString('logged_in', "true");
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Home(
+                center_x: 37.4220656,
+                center_y: 122.0862784,
+                locationRadius: 200.0,
+              )),
+    );
   }
 
   @override
@@ -91,7 +118,7 @@ class _LoginState extends State<Login> {
         child: Column(
           children: [
             Container(
-              height: MediaQuery.of(context).size.height * 0.96,
+              height: MediaQuery.of(context).size.height,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/media/bg2.jpg"),
