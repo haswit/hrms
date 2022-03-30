@@ -18,7 +18,7 @@ class _SettingsState extends State<Settings> {
   var _selected = "UAE";
   var _country_code = "ar";
   late final prefs;
-  late String loggedin;
+  var loggedin;
 
   intSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -47,7 +47,6 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-      
           body: Container(
               width: double.infinity,
               child: Column(
