@@ -47,6 +47,14 @@ dependencies:
   awesome_notifications: any # Any attribute updates automatically your source to the last version
   flutter_launcher_icons: "^0.9.2"
   easy_localization: ^3.0.0
+  http: ^0.13.4
+  flutter_easyloading: ^3.0.3
+  
+  flutter_geofence: ^0.4.2
+  geofencing: ^0.1.0
+
+
+
 
 
 

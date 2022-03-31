@@ -9,6 +9,10 @@ import 'services/auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'services/request_location.dart';
+import 'dart:convert' as convert;
+import 'dart:convert' show utf8;
+
+import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -88,19 +92,31 @@ class _LoginState extends State<Login> {
   }
 
   AuthUser() async {
-    await prefs.setString('cin', '123456456');
+    var client = http.Client();
+    try {
+      var response = await client.post(Uri.https('139.59.58.11', 'auth'),
+          body: {'name': 'doodle', 'color': 'blue'});
+      var decodedResponse =
+          convert.jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+      var uri = Uri.parse(decodedResponse['uri'] as String);
+      print(await client.get(uri));
+    } finally {
+      client.close();
+    }
 
-    await prefs.setString('logged_in', "true");
+    // await prefs.setString('cin', '123456456');
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => Home(
-                center_x: 37.4220656,
-                center_y: 122.0862784,
-                locationRadius: 200.0,
-              )),
-    );
+    // await prefs.setString('logged_in', "true");
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //       builder: (context) => Home(
+    //             center_x: 37.4220656,
+    //             center_y: 122.0862784,
+    //             locationRadius: 200.0,
+    //           )),
+    // );
   }
 
   @override
