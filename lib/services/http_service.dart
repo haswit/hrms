@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hrms_app/homeScreen.dart';
+import 'package:hrms_app/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hrms_app/home.dart';
@@ -26,7 +26,7 @@ class HttpService {
       if (json[0] == 'success') {
         await EasyLoading.showSuccess(json[0]);
         await Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            context, MaterialPageRoute(builder: (context) => Home()));
       } else {
         EasyLoading.showError(json[0]);
       }
@@ -49,7 +49,7 @@ class HttpService {
       } else {
         await EasyLoading.showSuccess(json[0]);
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            context, MaterialPageRoute(builder: (context) => Home()));
       }
     } else {
       await EasyLoading.showError(

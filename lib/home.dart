@@ -231,10 +231,7 @@ class _HomeState extends State<Home> {
                 children: [
                   ListTile(
                     title: Text("Notifications"),
-                    onTap: () {
-                      createNotification(
-                          "Notification Title", "Notification Body");
-                    },
+                    onTap: () {},
                   ),
                   ListTile(
                     onTap: () {

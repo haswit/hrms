@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hrms_app/camera.dart';
 import 'package:hrms_app/gps_alert.dart';
-import 'package:hrms_app/homeScreen.dart';
 import 'home.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:ui';
@@ -11,7 +10,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'services/request_location.dart';
 import 'dart:convert' as convert;
 import 'dart:convert' show utf8;
-
+import 'navigatino_home_screen.dart';
 import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
@@ -92,43 +91,32 @@ class _LoginState extends State<Login> {
   }
 
   AuthUser() async {
-    var client = http.Client();
-    try {
-      var response = await client.post(Uri.https('139.59.58.11', 'auth'),
-          body: {'name': 'doodle', 'color': 'blue'});
-      var decodedResponse =
-          convert.jsonDecode(utf8.decode(response.bodyBytes)) as Map;
-      var uri = Uri.parse(decodedResponse['uri'] as String);
-      print(await client.get(uri));
-    } finally {
-      client.close();
-    }
+    await prefs.setString('cin', '123456456');
 
-    // await prefs.setString('cin', '123456456');
+    await prefs.setString('logged_in', "true");
 
-    // await prefs.setString('logged_in', "true");
-
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //       builder: (context) => Home(
-    //             center_x: 37.4220656,
-    //             center_y: 122.0862784,
-    //             locationRadius: 200.0,
-    //           )),
-    // );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Home(
+                center_x: 37.4220656,
+                center_y: 122.0862784,
+                locationRadius: 200.0,
+              )),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    IO.Socket socket = IO.io('http://localhost:5000', <String, dynamic>{
-      'transports': ['websocket'],
-      'extraHeaders': {'foo': 'bar'} // optional
-    });
+    // IO.Socket socket = IO.io('http://localhost:5000', <String, dynamic>{
+    //   'transports': ['websocket'],
+    //   'extraHeaders': {'foo': 'bar'} // optional
+    // });
 
-    socket.onConnect((_) {
-      socket.emit('msg', 'test');
-    });
+    // socket.onConnect((_) {
+    //   socket.emit('msg', 'test');
+    // });
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -220,7 +208,7 @@ class _LoginState extends State<Login> {
                                                           const EdgeInsets.only(
                                                               bottom: 8.0),
                                                       child: Text(
-                                                        "Email",
+                                                        "ID",
                                                         style: TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 20,
@@ -232,7 +220,7 @@ class _LoginState extends State<Login> {
                                                     CustomInput(
                                                       suffix: null,
                                                       showText: true,
-                                                      hint: 'Enter Email',
+                                                      hint: 'Enter ID',
                                                     ),
                                                   ],
                                                 ),
