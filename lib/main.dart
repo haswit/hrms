@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'app_theme.dart';
-import 'home.dart';
-import 'login.dart';
-import 'uploadtest.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hrms_app/home.dart';
+import 'package:hrms_app/login.dart';
+import 'navigatino_home_screen.dart';
 import 'settings.dart';
-import 'sos.dart';
-import 'biometric.dart';
-import 'gps_alert.dart';
-import 'services/request_location.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'notificationspage.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:provider/provider.dart';
+import 'package:hrms_app/models/profile.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,12 +25,14 @@ Future<void> main() async {
             enableLights: true,
             enableVibration: true)
       ]);
-  runApp(EasyLocalization(
-    fallbackLocale: Locale('ar', 'UAE'),
-    supportedLocales: [Locale('en', 'US'), Locale('ar', 'UAE')],
-    path: 'assets/translations',
-    child: MyApp(),
-  ));
+  runApp(
+    EasyLocalization(
+      fallbackLocale: Locale('ar', 'UAE'),
+      supportedLocales: [Locale('en', 'US'), Locale('ar', 'UAE')],
+      path: 'assets/translations',
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -44,17 +41,26 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'APP',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      home: MyHomePage(title: 'APP'),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<Profile>(
+            create: (final BuildContext context) {
+              return Profile();
+            },
+          )
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'APP',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          home: MyHomePage(title: 'APP'),
+          builder: EasyLoading.init(),
+        ));
   }
 }
 
@@ -76,7 +82,33 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Profile profile = Provider.of<Profile>(context, listen: false);
+
     return SafeArea(
-        child: Scaffold(body: Container(child: Center(child: Settings()))));
+        child: WillPopScope(
+            onWillPop: () async {
+              // You can do some work here.
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text("Are your sure?"),
+                  content: Text("you want to close the app"),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                      },
+                      child: Text("okay"),
+                    ),
+                    FlatButton(
+                      onPressed: () {},
+                      child: Text("Cancel"),
+                    ),
+                  ],
+                ),
+              ); // Returning true allows the pop to happen, returning false prevents it.
+              return true;
+            },
+            child: Scaffold(body: Container(child: Settings()))));
   }
 }

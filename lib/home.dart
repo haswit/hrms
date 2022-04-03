@@ -13,6 +13,8 @@ import 'package:camera/camera.dart';
 import 'login.dart';
 import 'package:easy_localization/easy_localization.dart' as Loc;
 import 'notifications.dart';
+import 'package:provider/provider.dart';
+import 'package:hrms_app/models/profile.dart';
 
 class Home extends StatefulWidget {
 // /  final center_x = 17.391911;
@@ -20,15 +22,21 @@ class Home extends StatefulWidget {
 
   //final double center_x = 17.390689;
 
-  var locationRadius;
+  var inner_radius;
+  var outer_radius;
   var center_y;
   var center_x;
-
-  Home({this.center_x, this.center_y, this.locationRadius});
+  var gain;
+  Home(
+      {this.center_x,
+      this.center_y,
+      this.inner_radius,
+      this.outer_radius,
+      this.gain});
 
   @override
-  State<Home> createState() =>
-      _HomeState(this.center_x, this.center_y, this.locationRadius);
+  State<Home> createState() => _HomeState(this.center_x, this.center_y,
+      this.inner_radius, this.outer_radius, this.gain);
 }
 
 class _HomeState extends State<Home> {
@@ -36,14 +44,18 @@ class _HomeState extends State<Home> {
   var _center_y;
   var _center;
   var map_circle;
-  var _locationRadius;
+  var _inner_radius;
+  var _outer_radius;
+  var _gain;
 
-  _HomeState(double center_x, double center_y, double locationRadius) {
+  _HomeState(double center_x, double center_y, double inner_radius,
+      double outer_radius, double gain) {
     this._center_x = center_x;
     this._center_y = center_y;
-    this._locationRadius = _locationRadius;
+    this._inner_radius = inner_radius;
+    this._outer_radius = outer_radius;
     this._center = LatLng(center_x, center_y);
-
+    this._gain = gain;
     map_circle = LatLng(_center_x, _center_y);
   }
 
@@ -201,13 +213,13 @@ class _HomeState extends State<Home> {
             fillColor: Color.fromARGB(57, 4, 245, 16),
             circleId: CircleId("one"),
             center: map_circle,
-            radius: 600.0,
+            radius: _outer_radius,
             strokeColor: Color.fromARGB(0, 33, 149, 243)),
         Circle(
             fillColor: Color.fromARGB(136, 245, 133, 4),
             circleId: CircleId("one"),
             center: map_circle,
-            radius: 200.0,
+            radius: _inner_radius,
             strokeColor: Color.fromARGB(0, 33, 149, 243)),
       ]);
     });
@@ -217,202 +229,148 @@ class _HomeState extends State<Home> {
     final distance = tk.SphericalUtil.computeDistanceBetween(
         tk.LatLng(widget.center_x, widget.center_y), l);
 
-    return distance < widget.locationRadius;
+    return distance < widget.inner_radius;
   }
 
   @override
   Widget build(BuildContext context) {
     //context.locale = Locale('ar', 'UAE');
+    final Profile profile = Provider.of<Profile>(context, listen: false);
 
-    return SafeArea(
-        child: Scaffold(
-            drawer: Drawer(
-              child: ListView(
-                children: [
-                  ListTile(
-                    title: Text("Notifications"),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Settings()),
-                      );
-                    },
-                    title: Text("Setting"),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Sos()),
-                      );
-                    },
-                    title: Text("SOS"),
-                  )
-                ],
-              ),
-            ),
-            appBar: AppBar(
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 15.0),
-                  child: IconButton(
-                    onPressed: () async {
-                      logout(context);
-                    },
-                    icon: Icon(Icons.logout_sharp, size: 28),
-                  ),
-                )
-              ],
-              title: Text(
-                "HRMS APP",
-                style: TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Color.fromARGB(255, 36, 14, 97),
-            ),
-            body: SingleChildScrollView(
-              child: Container(
-                margin: EdgeInsets.only(top: 10),
-                padding: EdgeInsets.all(10),
-                child: Column(children: [
-                  Visibility(
-                    visible: InLoginZone ? false : true,
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.all(5),
-                      color: Color.fromARGB(82, 244, 132, 3),
-                      child: SingleChildScrollView(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Icon(Icons.info),
-                            ),
-                            Text(
-                              "warning".tr().toString(),
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 7, 7, 7),
-                              ),
-                            ),
-                          ],
-                        ),
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.only(top: 0),
+        padding: EdgeInsets.all(10),
+        child: Column(children: [
+          Visibility(
+            visible: InLoginZone ? false : true,
+            child: Container(
+              margin: EdgeInsets.only(bottom: 10),
+              padding: EdgeInsets.all(5),
+              color: Color.fromARGB(82, 244, 132, 3),
+              child: SingleChildScrollView(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(Icons.info),
+                    ),
+                    Text(
+                      "warning".tr().toString(),
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 7, 7, 7),
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(3),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          SizedBox(
-                              height: 50,
-                              width: MediaQuery.of(context).size.width * 0.4,
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      shadowColor: Colors.green,
-                                      primary:
-                                          Color.fromARGB(221, 27, 202, 65)),
-                                  onPressed: InLoginZone
-                                      ? () async {
-                                          await availableCameras()
-                                              .then((value) => Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        CameraPage(
-                                                      cameras: value,
-                                                    ),
-                                                  )));
-                                        }
-                                      : null,
-                                  child: Text(
-                                    "IN",
-                                    style: TextStyle(fontSize: 25),
-                                  ))),
-                          SizedBox(
-                              height: 50,
-                              width: MediaQuery.of(context).size.width * 0.4,
-                              child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      primary:
-                                          Color.fromARGB(226, 244, 67, 54)),
-                                  onPressed: 1 == 2 //InLoginZone
-                                      ? () async {
-                                          await availableCameras()
-                                              .then((value) => Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        CameraPage(
-                                                      cameras: value,
-                                                    ),
-                                                  )));
-                                        }
-                                      : null,
-                                  child: Text("OUT",
-                                      style: TextStyle(fontSize: 25)))),
-                        ]),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(right: 10, left: 20),
-                            decoration: BoxDecoration(
-                                color: Color.fromARGB(131, 244, 132, 3),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            height: 20,
-                            width: 20,
-                          ),
-                          Text("Login zone"),
-                          SizedBox(
-                            width: 20,
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(right: 10, left: 20),
-                            decoration: BoxDecoration(
-                                color: Color.fromARGB(167, 27, 202, 65),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            height: 20,
-                            width: 20,
-                          ),
-                          Text("Office zone")
-                        ],
-                      )
-                    ],
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    height: 680,
-                    child: GoogleMap(
-                        minMaxZoomPreference: MinMaxZoomPreference(15, 1000),
-                        zoomControlsEnabled: true,
-                        myLocationEnabled: true,
-                        zoomGesturesEnabled: true,
-                        myLocationButtonEnabled: true,
-                        onMapCreated: _onMapCreated,
-                        onCameraMove: (CameraPosition position) {
-                          _cameraPosition = position.target;
-                          _mapZoom = position.zoom;
-                        },
-                        markers: _markers,
-                        circles: circles,
-                        initialCameraPosition: CameraPosition(
-                          target: _center,
-                          zoom: _mapZoom,
-                        )),
-                  )
-                ]),
+                  ],
+                ),
               ),
-            )));
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(3),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              shadowColor: Colors.green,
+                              primary: Color.fromARGB(221, 27, 202, 65)),
+                          onPressed: InLoginZone
+                              ? () async {
+                                  await availableCameras()
+                                      .then((value) => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => CameraPage(
+                                              cameras: value,
+                                            ),
+                                          )));
+                                }
+                              : null,
+                          child: Text(
+                            "IN",
+                            style: TextStyle(fontSize: 25),
+                          ))),
+                  SizedBox(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              primary: Color.fromARGB(226, 244, 67, 54)),
+                          onPressed: 1 == 2 //InLoginZone
+                              ? () async {
+                                  await availableCameras()
+                                      .then((value) => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => CameraPage(
+                                              cameras: value,
+                                            ),
+                                          )));
+                                }
+                              : null,
+                          child: Text("OUT", style: TextStyle(fontSize: 25)))),
+                ]),
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(right: 10, left: 20),
+                    decoration: BoxDecoration(
+                        color: Color.fromARGB(131, 244, 132, 3),
+                        borderRadius: BorderRadius.all(Radius.circular(20))),
+                    height: 20,
+                    width: 20,
+                  ),
+                  Text("Login zone"),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(right: 10, left: 20),
+                    decoration: BoxDecoration(
+                        color: Color.fromARGB(167, 27, 202, 65),
+                        borderRadius: BorderRadius.all(Radius.circular(20))),
+                    height: 20,
+                    width: 20,
+                  ),
+                  Text("Office zone")
+                ],
+              )
+            ],
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            height: MediaQuery.of(context).size.height * 0.72,
+            child: GoogleMap(
+                minMaxZoomPreference: MinMaxZoomPreference(15, 1000),
+                zoomControlsEnabled: true,
+                myLocationEnabled: true,
+                zoomGesturesEnabled: true,
+                myLocationButtonEnabled: true,
+                onMapCreated: _onMapCreated,
+                onCameraMove: (CameraPosition position) {
+                  _cameraPosition = position.target;
+                  _mapZoom = position.zoom;
+                },
+                markers: _markers,
+                circles: circles,
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: _mapZoom,
+                )),
+          )
+        ]),
+      ),
+    );
   }
 }

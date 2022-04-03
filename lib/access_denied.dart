@@ -1,37 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 
-class GpsAlert extends StatelessWidget {
-  GpsAlert({Key? key}) : super(key: key);
-
-  Location location = new Location();
-
-  request_location(context) async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    LocationData _locationData;
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-
-      if (!_serviceEnabled) {
-        return false;
-      }
-    }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return false;
-      }
-    }
-
-    Navigator.pop(context);
-
-    //_locationData = await location.getLocation();
-  }
+class AccessDenied extends StatelessWidget {
+  const AccessDenied({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +13,12 @@ class GpsAlert extends StatelessWidget {
         children: [
           Center(
             child: Image.asset(
-              "assets/media/gps.png",
+              "assets/media/access_denied.png",
               width: 250,
             ),
           ),
           Text(
-            "Location is Off",
+            "Your subscription has been expired!",
             style: TextStyle(fontSize: 30, fontFamily: 'Calistoga'),
           ),
           SizedBox(
@@ -69,8 +39,6 @@ class GpsAlert extends StatelessWidget {
             child: RaisedButton(
               onPressed: () async {
                 //AuthUser();
-
-                request_location(context);
               },
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40.0)),

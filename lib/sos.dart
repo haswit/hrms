@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hrms_app/drawer.dart';
+import 'appbar.dart';
+import '../app_theme.dart';
 
 class Sos extends StatefulWidget {
   const Sos({Key? key}) : super(key: key);
@@ -9,14 +12,23 @@ class Sos extends StatefulWidget {
 
 class _SosState extends State<Sos> with TickerProviderStateMixin {
   late AnimationController _controller;
+
   @override
   void initState() {
+    // TODO: implement initState
+
     super.initState();
     _controller = AnimationController(
       vsync: this,
       lowerBound: 0.5,
       duration: Duration(seconds: 3),
     )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // you need this
+    super.dispose();
   }
 
   @override
@@ -98,13 +110,17 @@ class _SosState extends State<Sos> with TickerProviderStateMixin {
   }
 
   Widget _buildContainer(double radius) {
-    return Container(
-      width: radius,
-      height: radius,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color:
-            Color.fromARGB(139, 244, 67, 54).withOpacity(1 - _controller.value),
+    return Scaffold(
+      drawer: MyDrawer(),
+      appBar: headerNav(),
+      body: Container(
+        width: radius,
+        height: radius,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Color.fromARGB(139, 244, 67, 54)
+              .withOpacity(1 - _controller.value),
+        ),
       ),
     );
   }

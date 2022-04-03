@@ -2,20 +2,24 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hrms_app/home.dart';
+import 'package:hrms_app/settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hrms_app/home.dart';
+import 'package:hrms_app/access_denied.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:hrms_app/models/profile.dart';
 
 class HttpService {
   static final _client = http.Client();
 
-  static var _loginUrl = Uri.parse('');
+  static var _loginUrl = Uri.parse('http://lghrms.live/login');
 
-  static var _registerUrl = Uri.parse('');
-
-  static login(email, password, context) async {
+  static login(cin, id, password, context, prefs) async {
     http.Response response = await _client.post(_loginUrl, body: {
-      "email": email,
+      "cin": cin,
+      "id": id,
       "password": password,
     });
 
@@ -23,33 +27,39 @@ class HttpService {
       print(jsonDecode(response.body));
       var json = jsonDecode(response.body);
 
-      if (json[0] == 'success') {
-        await EasyLoading.showSuccess(json[0]);
-        await Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Home()));
-      } else {
-        EasyLoading.showError(json[0]);
-      }
-    } else {
-      await EasyLoading.showError(
-          "Error Code : ${response.statusCode.toString()}");
-    }
-  }
+      if (json["status"] == 'success') {
+        await EasyLoading.showSuccess("Logged In successfuly");
+        var user = json['user'];
 
-  static register(email, password, context) async {
-    http.Response response = await _client.post(_registerUrl, body: {
-      "email": email,
-      "password": password,
-    });
+        await prefs.setString('cin', user['cin']);
 
-    if (response.statusCode == 200) {
-      var json = jsonDecode(response.body);
-      if (json[0] == 'username already exist') {
-        await EasyLoading.showError(json[0]);
+        await prefs.setString('logged_in', "true");
+
+        final Profile profile = Provider.of<Profile>(context, listen: false);
+
+        profile.cin = user['cin'];
+        profile.id = user['id'];
+        profile.inner_radius = user['inner_radius'];
+        profile.outer_radius = user['outer_radius'];
+        profile.gain = user['gain'];
+
+        if (user['subscribed'] == false) {
+          await Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AccessDenied()));
+        } else {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Home(
+                    center_x: profile.latitude,
+                    center_y: profile.longitude,
+                    inner_radius: profile.inner_radius,
+                    outer_radius: profile.inner_radius,
+                    gain: profile.gain)),
+          );
+        }
       } else {
-        await EasyLoading.showSuccess(json[0]);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Home()));
+        EasyLoading.showError(json["status"]);
       }
     } else {
       await EasyLoading.showError(

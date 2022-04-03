@@ -12,6 +12,10 @@ import 'dart:convert' as convert;
 import 'dart:convert' show utf8;
 import 'navigatino_home_screen.dart';
 import 'package:http/http.dart' as http;
+import 'navigatino_home_screen.dart';
+import 'services/http_service.dart';
+import 'package:provider/provider.dart';
+import 'package:hrms_app/models/profile.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -21,6 +25,9 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  TextEditingController _cinController = TextEditingController();
+  TextEditingController _idController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late final prefs;
   var cin = "";
@@ -70,15 +77,19 @@ class _LoginState extends State<Login> {
         );
       } else {
         await prefs.setString('logged_in', "true");
+        final Profile profile = Provider.of<Profile>(context, listen: false);
+
+        profile.loggedin = true;
 
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => Home(
-                    center_x: 37.4220656,
-                    center_y: 122.0862784,
-                    locationRadius: 200.0,
-                  )),
+                  center_x: profile.latitude,
+                  center_y: profile.longitude,
+                  inner_radius: profile.inner_radius,
+                  outer_radius: profile.inner_radius,
+                  gain: profile.gain)),
         );
       }
     } else {
@@ -91,19 +102,12 @@ class _LoginState extends State<Login> {
   }
 
   AuthUser() async {
-    await prefs.setString('cin', '123456456');
-
-    await prefs.setString('logged_in', "true");
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => Home(
-                center_x: 37.4220656,
-                center_y: 122.0862784,
-                locationRadius: 200.0,
-              )),
-    );
+    await HttpService.login(
+        _cinController.text.toString(),
+        _idController.text.toString(),
+        _passwordController.text.toString(),
+        context,
+        prefs);
   }
 
   @override
@@ -189,6 +193,8 @@ class _LoginState extends State<Login> {
                                                       ),
                                                     ),
                                                     CustomInput(
+                                                      controller:
+                                                          _cinController,
                                                       suffix: null,
                                                       showText: true,
                                                       hint: 'Enter CIN Number',
@@ -218,6 +224,7 @@ class _LoginState extends State<Login> {
                                                       ),
                                                     ),
                                                     CustomInput(
+                                                      controller: _idController,
                                                       suffix: null,
                                                       showText: true,
                                                       hint: 'Enter ID',
@@ -245,6 +252,8 @@ class _LoginState extends State<Login> {
                                                       ),
                                                     ),
                                                     CustomInput(
+                                                      controller:
+                                                          _passwordController,
                                                       suffix: IconButton(
                                                         icon: Icon(
                                                           // Based on passwordVisible state choose the icon
@@ -418,12 +427,15 @@ class CustomInput extends StatelessWidget {
   final hint;
   final showText;
   final suffix;
-  const CustomInput({Key? key, this.hint, this.showText, this.suffix})
+  final controller;
+  const CustomInput(
+      {Key? key, this.hint, this.showText, this.suffix, this.controller})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: this.controller,
       obscureText: showText == true ? false : true,
       decoration: InputDecoration(
         suffixIcon: this.suffix,

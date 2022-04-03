@@ -1,5 +1,8 @@
-import '../app_theme.dart';
+import 'package:hrms_app/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:hrms_app/models/profile.dart';
+import 'package:hrms_app/services/auth.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer(
@@ -48,6 +51,8 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final Profile profile = Provider.of<Profile>(context, listen: false);
+
     return Scaffold(
       backgroundColor: AppTheme.notWhite.withOpacity(0.5),
       body: Column(
@@ -92,7 +97,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
                             child: ClipRRect(
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(60.0)),
-                              child: Image.asset('assets/images/userImage.png'),
+                              child: Image.asset(
+                                'assets/images/userImage.png',
+                              ),
                             ),
                           ),
                         ),
@@ -100,9 +107,10 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     },
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8, left: 4),
+                    padding:
+                        const EdgeInsets.only(top: 15, left: 25, right: 25),
                     child: Text(
-                      'User Name',
+                      'UserName',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.grey,
@@ -153,7 +161,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   color: Colors.red,
                 ),
                 onTap: () {
-                  onTapped();
+                  logout(context);
                 },
               ),
               SizedBox(
@@ -164,10 +172,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
         ],
       ),
     );
-  }
-
-  void onTapped() {
-    print('Doing Something...'); // Print to console.
   }
 
   Widget inkwell(DrawerList listData) {

@@ -1,5 +1,5 @@
-import '../app_theme.dart';
-import '../custom_drawer/home_drawer.dart';
+import 'package:hrms_app/app_theme.dart';
+import 'package:hrms_app/custom_drawer/home_drawer.dart';
 import 'package:flutter/material.dart';
 
 class DrawerUserController extends StatefulWidget {
@@ -176,10 +176,14 @@ class _DrawerUserControllerState extends State<DrawerUserController>
                                 // if you use your own menu view UI you add form initialization
                                 child: widget.menuView != null
                                     ? widget.menuView
-                                    : AnimatedIcon(
-                                        icon: widget.animatedIconData ??
-                                            AnimatedIcons.arrow_menu,
-                                        progress: iconAnimationController!),
+                                    : Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 5.0),
+                                        child: AnimatedIcon(
+                                            icon: widget.animatedIconData ??
+                                                AnimatedIcons.arrow_menu,
+                                            progress: iconAnimationController!),
+                                      ),
                               ),
                               onTap: () {
                                 FocusScope.of(context)
