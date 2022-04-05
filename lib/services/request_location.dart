@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-Location location = new Location();
+Location location = Location();
 
-Future<bool> request_location() async {
+Future<bool> requestLocation() async {
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
-  LocationData _locationData;
 
   _serviceEnabled = await location.serviceEnabled();
   if (!_serviceEnabled) {

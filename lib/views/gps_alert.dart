@@ -1,15 +1,18 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
+// ignore: must_be_immutable
 class GpsAlert extends StatelessWidget {
   GpsAlert({Key? key}) : super(key: key);
 
-  Location location = new Location();
+  Location location = Location();
 
+  // ignore: non_constant_identifier_names
   request_location(context) async {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
-    LocationData _locationData;
 
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
@@ -47,14 +50,14 @@ class GpsAlert extends StatelessWidget {
               width: 250,
             ),
           ),
-          Text(
+          const Text(
             "Location is Off",
             style: TextStyle(fontSize: 30, fontFamily: 'Calistoga'),
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
-          Text(
+          const Text(
             "Please turn on your phone's location",
             style: TextStyle(
               fontSize: 18,
@@ -63,7 +66,7 @@ class GpsAlert extends StatelessWidget {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.3,
           ),
-          Container(
+          SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             height: 50.0,
             child: RaisedButton(
@@ -74,10 +77,10 @@ class GpsAlert extends StatelessWidget {
               },
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40.0)),
-              padding: EdgeInsets.all(0.0),
+              padding: const EdgeInsets.all(0.0),
               child: Ink(
                 decoration: BoxDecoration(
-                    gradient: LinearGradient(
+                    gradient: const LinearGradient(
                       colors: [Color(0xff374ABE), Color(0xff64B6FF)],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
@@ -85,9 +88,9 @@ class GpsAlert extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10.7)),
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  constraints: BoxConstraints(minHeight: 50.0),
+                  constraints: const BoxConstraints(minHeight: 50.0),
                   alignment: Alignment.center,
-                  child: Text(
+                  child: const Text(
                     "Turn on GPS",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 15),
@@ -96,7 +99,7 @@ class GpsAlert extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           )
         ],

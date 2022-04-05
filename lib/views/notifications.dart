@@ -2,7 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'dart:math';
 
 Future<void> createNotification(title, body) async {
-  Random random = new Random();
+  Random random = Random();
   int randomNumber = random.nextInt(100000);
 
   await AwesomeNotifications().createNotification(

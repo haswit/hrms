@@ -1,11 +1,14 @@
-import 'package:get/get.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import '../widgets/appbar.dart';
+import '../widgets/drawer.dart';
 import 'image_preview.dart';
 
 class CameraPage extends StatefulWidget {
   final List<CameraDescription>? cameras;
-  const CameraPage({this.cameras, Key? key}) : super(key: key);
+  final String session;
+  const CameraPage({this.cameras, required this.session, Key? key})
+      : super(key: key);
 
   @override
   _CameraPageState createState() => _CameraPageState();
@@ -47,17 +50,15 @@ class _CameraPageState extends State<CameraPage> {
     }
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Capture Image"),
-          backgroundColor: Color.fromARGB(255, 36, 14, 97),
-        ),
+        appBar: headerNav(),
+        drawer: const MyDrawer(),
         body: Column(
           children: [
             SizedBox(
                 height: MediaQuery.of(context).size.height * 0.8,
                 width: MediaQuery.of(context).size.width,
                 child: CameraPreview(controller)),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             InkWell(
@@ -67,7 +68,8 @@ class _CameraPageState extends State<CameraPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => picture(
+                      builder: (context) => Picture(
+                        session : widget.session,
                             pictureFile: pictureFile,
                           )),
                 );
