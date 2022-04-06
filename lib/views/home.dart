@@ -153,17 +153,7 @@ class _HomeState extends State<Home> {
   }
 
   late Set<Circle> circles;
-
-  // NotifyUser(String? title) {
-  //   const snackBar = SnackBar(
-  //     content: Text(title),
-  //   );
-
-// Find the ScaffoldMessenger in the widget tree
-// and use it to show a SnackBar.
-  //ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //}
-
+  bool alreadyIn = false;
   @override
   void initState() {
     super.initState();
@@ -234,16 +224,100 @@ class _HomeState extends State<Home> {
     return distance < widget.innerRadius;
   }
 
+  bottomModalSheet() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Text("Todays sessions"),
+                ),
+                Container(
+                  height: 700,
+                  child: FutureBuilder(
+                    future: HttpService().getSessions(),
+                    builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data[snapshot.data.length - 1]
+                                ['session'] ==
+                            "IN") {
+                          alreadyIn = true;
+                        }
+
+                        return ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color:
+                                            Color.fromARGB(96, 210, 217, 230),
+                                        blurRadius: 2,
+                                        spreadRadius: 2,
+                                        offset: Offset.zero,
+                                        blurStyle: BlurStyle.normal)
+                                  ],
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        width: .2,
+                                        color: Colors.lightBlue.shade900),
+                                  ),
+                                ),
+                                child: ListTile(
+                                  trailing: Icon(
+                                    Icons.photo,
+                                    color: Colors.blue,
+                                  ),
+                                  title: Text(snapshot.data[index]['session']),
+                                  subtitle:
+                                      Text(snapshot.data[index]['date_time']),
+                                  leading: Container(
+                                    margin: EdgeInsets.only(top: 5),
+                                    decoration: BoxDecoration(
+                                        color: snapshot.data[index]
+                                                    ['session'] ==
+                                                "IN"
+                                            ? Colors.green
+                                            : Colors.red,
+                                        borderRadius:
+                                            BorderRadius.circular(50)),
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                ),
+                              );
+                            });
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+                ),
+                Text("end")
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     //context.locale = Locale('ar', 'UAE');
-    var data = HttpService.getSessions();
-
-    print("==============data============");
-    print(data);
 
     return SafeArea(
       child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.arrow_upward_sharp),
+          onPressed: () {
+            bottomModalSheet();
+          },
+        ),
         appBar: headerNav(),
         drawer: const MyDrawer(),
         body: SingleChildScrollView(
@@ -251,122 +325,16 @@ class _HomeState extends State<Home> {
             margin: const EdgeInsets.only(top: 0),
             padding: const EdgeInsets.all(10),
             child: Column(children: [
-              Visibility(
-                visible: inLoginZone ? false : true,
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(5),
-                  color: const Color.fromARGB(82, 244, 132, 3),
-                  child: SingleChildScrollView(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: Icon(Icons.info),
-                        ),
-                        Text(
-                          "warning".tr().toString(),
-                          style: const TextStyle(
-                            color: Color.fromARGB(255, 7, 7, 7),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              OutOfRadiusMessage(
+                inLoginZone: inLoginZone,
               ),
-              Container(
-                padding: const EdgeInsets.all(3),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      SizedBox(
-                          height: 50,
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  shadowColor: Colors.green,
-                                  primary:
-                                      const Color.fromARGB(221, 27, 202, 65)),
-                              onPressed: inLoginZone
-                                  ? () async {
-                                      await availableCameras()
-                                          .then((value) => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CameraPage(
-                                                  session: "IN",
-                                                  cameras: value,
-                                                ),
-                                              )));
-                                    }
-                                  : null,
-                              child: const Text(
-                                "IN",
-                                style: TextStyle(fontSize: 25),
-                              ))),
-                      SizedBox(
-                          height: 50,
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  primary:
-                                      const Color.fromARGB(226, 244, 67, 54)),
-                              onPressed: //inLoginZone
-                                  () async {
-                                await availableCameras()
-                                    .then((value) => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => CameraPage(
-                                            session: "OUT",
-                                            cameras: value,
-                                          ),
-                                        )));
-                              },
-                              child: const Text("OUT",
-                                  style: TextStyle(fontSize: 25)))),
-                    ]),
-              ),
+              LoginButtons(inLoginZone: inLoginZone),
               const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 10, left: 20),
-                        decoration: const BoxDecoration(
-                            color: Color.fromARGB(131, 244, 132, 3),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        height: 20,
-                        width: 20,
-                      ),
-                      const Text("Login zone"),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(right: 10, left: 20),
-                        decoration: const BoxDecoration(
-                            color: Color.fromARGB(167, 27, 202, 65),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        height: 20,
-                        width: 20,
-                      ),
-                      const Text("Office zone")
-                    ],
-                  )
-                ],
-              ),
+              RadiusInfoChips(),
+              const SizedBox(height: 10),
               Container(
                 margin: const EdgeInsets.only(top: 10),
-                height: MediaQuery.of(context).size.height * 0.72,
+                height: MediaQuery.of(context).size.height * 0.8,
                 child: GoogleMap(
                     minMaxZoomPreference: const MinMaxZoomPreference(15, 1000),
                     zoomControlsEnabled: true,
@@ -386,6 +354,139 @@ class _HomeState extends State<Home> {
                     )),
               ),
             ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RadiusInfoChips extends StatelessWidget {
+  const RadiusInfoChips({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(right: 10, left: 20),
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(131, 244, 132, 3),
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              height: 20,
+              width: 20,
+            ),
+            const Text("Login zone"),
+            const SizedBox(
+              width: 20,
+            ),
+            Container(
+              margin: const EdgeInsets.only(right: 10, left: 20),
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(167, 27, 202, 65),
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              height: 20,
+              width: 20,
+            ),
+            const Text("Office zone")
+          ],
+        )
+      ],
+    );
+  }
+}
+
+class LoginButtons extends StatelessWidget {
+  const LoginButtons({
+    Key? key,
+    required this.inLoginZone,
+  }) : super(key: key);
+
+  final bool inLoginZone;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(3),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        SizedBox(
+            height: 50,
+            width: MediaQuery.of(context).size.width * 0.4,
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shadowColor: Colors.green,
+                    primary: const Color.fromARGB(221, 27, 202, 65)),
+                onPressed: inLoginZone
+                    ? () async {
+                        await availableCameras().then((value) => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CameraPage(
+                                session: "IN",
+                                cameras: value,
+                              ),
+                            )));
+                      }
+                    : null,
+                child: const Text(
+                  "IN",
+                  style: TextStyle(fontSize: 25),
+                ))),
+        SizedBox(
+            height: 50,
+            width: MediaQuery.of(context).size.width * 0.4,
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    primary: const Color.fromARGB(226, 244, 67, 54)),
+                onPressed: //inLoginZone
+                    () async {
+                  await availableCameras().then((value) => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CameraPage(
+                          session: "OUT",
+                          cameras: value,
+                        ),
+                      )));
+                },
+                child: const Text("OUT", style: TextStyle(fontSize: 25)))),
+      ]),
+    );
+  }
+}
+
+class OutOfRadiusMessage extends StatelessWidget {
+  final bool inLoginZone;
+  OutOfRadiusMessage({required this.inLoginZone});
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      visible: inLoginZone ? false : true,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(5),
+        color: const Color.fromARGB(82, 244, 132, 3),
+        child: SingleChildScrollView(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(Icons.info),
+              ),
+              Text(
+                "warning".tr().toString(),
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 7, 7, 7),
+                ),
+              ),
+            ],
           ),
         ),
       ),

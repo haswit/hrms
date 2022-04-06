@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hrms_app/views/access_denied.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpService {
   static final _client = http.Client();
@@ -78,24 +79,28 @@ class HttpService {
     }
   }
 
-  static getSessions() async {
-    MySharedPreferences.instance.getStringValue("id").then((id) async {
-      final DateTime now = DateTime.now();
-      final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  Future<List<dynamic>> getSessions() async {
+    var data = {};
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? id = prefs.getString("id");
 
-      final String date = formatter.format(now);
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
-      http.Response response = await _client
-          .post(Uri.parse('http://lghrms.live/get-session'), body: {
-        "id": id,
-        "date": date,
-      });
+    final String date = formatter.format(now);
 
-      if (response.statusCode == 200) {
-        var json = jsonDecode(response.body);
-        return json;
-      }
+    http.Response response =
+        await _client.post(Uri.parse('http://lghrms.live/get-session'), body: {
+      "id": id,
+      "date": date,
     });
+
+    if (response.statusCode == 200) {
+      var json = jsonDecode(response.body);
+      return json['data'];
+    } else {
+      return [];
+    }
   }
 
   static submitSession(

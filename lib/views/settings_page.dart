@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hrms_app/main.dart';
 import 'package:hrms_app/views/login.dart';
 import 'package:hrms_app/services/my_shared_prederences.dart';
 import 'package:hrms_app/widgets/custom_button.dart';
@@ -31,6 +32,8 @@ class _SettingsState extends State<Settings> {
     if (loggedIn != null) {
       setState(() {
         loggedin = loggedIn;
+        _countryCode = prefs.getString('_countryCode')!;
+        _selected = prefs.getString('_selectedLanguage')!;
       });
       // BioAuth();
     }
@@ -52,6 +55,9 @@ class _SettingsState extends State<Settings> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                ),
                 const Text(
                   "Choose Language",
                   style: TextStyle(
@@ -67,7 +73,7 @@ class _SettingsState extends State<Settings> {
                       fontFamily: 'Calistoga'),
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.2,
+                  height: MediaQuery.of(context).size.height * 0.1,
                 ),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -197,15 +203,12 @@ class _SettingsState extends State<Settings> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Login()),
+                                builder: (context) => const MyHomePage()),
                           );
                         }
                       },
                       text: "Continue"),
                 ),
-                const SizedBox(
-                  height: 20,
-                )
               ],
             )),
       ),
