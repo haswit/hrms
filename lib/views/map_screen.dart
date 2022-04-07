@@ -1,6 +1,5 @@
 // import 'package:easy_localization/easy_localization.dart';
 // import 'package:flutter/material.dart';
-// import 'package:hrms_app/services/http_service.dart';
 
 // class MapScreen extends StatelessWidget {
 //   @override
@@ -301,18 +300,11 @@
 
 // class _TodaysSessionsListViewState extends State<TodaysSessionsListView> {
 //   late List<Set<String>> SessionListData;
-//   fetchData() {
-//     var data = HttpService().getSessions();
-//     setState(() {
-//       SessionListData = data;
-//     });
-//   }
 
 //   @override
 //   void initState() {
 //     // TODO: implement initState
 //     super.initState();
-//     fetchData();
 //   }
 
 //   @override
@@ -325,44 +317,7 @@
 //           scrollDirection: Axis.vertical,
 //           itemCount: SessionListData.length,
 //           itemBuilder: (context, index) {
-//             return Container(
-//               decoration: BoxDecoration(
-//                 boxShadow: [
-//                   BoxShadow(
-//                       color: Color.fromARGB(96, 210, 217, 230),
-//                       blurRadius: 2,
-//                       spreadRadius: 2,
-//                       offset: Offset.zero,
-//                       blurStyle: BlurStyle.normal)
-//                 ],
-//                 border: Border(
-//                   bottom:
-//                       BorderSide(width: .2, color: Colors.lightBlue.shade900),
-//                 ),
-//               ),
-//               child: ListTile(
-//                 trailing: Icon(
-//                   Icons.photo,
-//                   color: Colors.blue,
-//                 ),
-//                 title: Text(SessionListData[index]["session"]),
-//                 subtitle: Text(SessionListData[index]["date_time"]),
-//                 leading: Container(
-//                   margin: EdgeInsets.only(top: 5),
-//                   decoration: BoxDecoration(
-//                       color: SessionListData[index]['session'] == "IN"
-//                           ? Colors.green
-//                           : Colors.red,
-//                       borderRadius: BorderRadius.circular(50)),
-//                   width: 20,
-//                   height: 20,
-//                 ),
-//               ),
-//             );
-
-//             {
-//               return Center(child: CircularProgressIndicator());
-//             }
+//             return Text("Data");
 //           },
 //         ),
 //       ),

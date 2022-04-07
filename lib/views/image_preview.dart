@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:hrms_app/services/auth.dart';
 import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/widgets/appbar.dart';
 import 'package:hrms_app/widgets/drawer.dart';
@@ -10,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class Picture extends StatelessWidget {
-  Picture({this.pictureFile, this.session, Key? key}) : super(key: key);
+  const Picture({this.pictureFile, this.session, Key? key}) : super(key: key);
   final String? session;
   final XFile? pictureFile;
 
@@ -18,15 +17,15 @@ class Picture extends StatelessWidget {
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    final DateFormat formatter_time = DateFormat('Hm');
+    final DateFormat formatterTime = DateFormat('Hm');
 
     final String formatted = formatter.format(now);
-    final String formatterTime = formatter_time.format(now);
+    final String _formatterTime = formatterTime.format(now);
 
     return SafeArea(
       child: Scaffold(
           appBar: headerNav(),
-          drawer: MyDrawer(),
+          drawer: const MyDrawer(),
           body: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -50,16 +49,16 @@ class Picture extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text(
+                              const Text(
                                 "SESSION:",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(left: 36),
+                                padding: const EdgeInsets.only(left: 36),
                                 child: Text(
                                   session!,
-                                  style: TextStyle(fontSize: 20),
+                                  style: const TextStyle(fontSize: 20),
                                 ),
                               ),
                             ],
@@ -69,16 +68,16 @@ class Picture extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              Text(
+                              const Text(
                                 "Date:",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(left: 70),
+                                padding: const EdgeInsets.only(left: 70),
                                 child: Text(
                                   formatted.toString(),
-                                  style: TextStyle(fontSize: 20),
+                                  style: const TextStyle(fontSize: 20),
                                 ),
                               ),
                             ],
@@ -88,16 +87,16 @@ class Picture extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              Text(
+                              const Text(
                                 "TIME:",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(left: 68),
+                                padding: const EdgeInsets.only(left: 68),
                                 child: Text(
-                                  formatterTime.toString(),
-                                  style: TextStyle(fontSize: 20),
+                                  _formatterTime.toString(),
+                                  style: const TextStyle(fontSize: 20),
                                 ),
                               ),
                             ],
@@ -114,9 +113,8 @@ class Picture extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: CustomButton(
                       onclickFunction: () {
-                        
                         HttpService.submitSession(context, session!,
-                            formatterTime, formatted, pictureFile);
+                            _formatterTime, formatted, pictureFile);
                       },
                       text: "Submit"),
                 )

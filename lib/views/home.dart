@@ -1,5 +1,8 @@
+import 'package:cron/cron.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/views/gps_alert.dart';
+import 'package:hrms_app/views/notifications.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as tk;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -157,7 +160,45 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+
     intSharedPrefs();
+
+    final cron = Cron();
+    cron.schedule(Schedule.parse('*/1 * * * *'), () async {
+      // print('every three minutes');
+      if (kDebugMode) {
+        print("CRON EXECUTING");
+      }
+      if (!prefs.containsKey("inLoginZone")) {
+        prefs.setBool("inLoginZone", inLoginZone);
+
+        HttpService.submitLocationTracking(inLoginZone);
+      } else {
+        if (prefs.getBool("inLoginZone") != inLoginZone) {
+          prefs.setBool("inLoginZone", inLoginZone);
+          HttpService.submitLocationTracking(inLoginZone);
+          if (!inLoginZone) {
+            createNotification("Please move into login zone",
+                "Logging out session in 3 minutes");
+          }
+        }
+      }
+    });
+
+    var _sessionsData = HttpService().getSessions();
+    _sessionsData.then((value) {
+      print(
+          "\n\n\n\n\n\============================================\ndata has been fethed");
+      if (value.length > 1) {
+        print(value[value.length - 1]['session']);
+
+        if (value[value.length - 1]['session'] == "IN") {
+          setState(() {
+            alreadyIn = true;
+          });
+        }
+      }
+    });
 
     AwesomeNotifications().isNotificationAllowed().then(
       (isAllowed) {
@@ -231,45 +272,30 @@ class _HomeState extends State<Home> {
           return SingleChildScrollView(
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(18.0),
+                const Padding(
+                  padding: EdgeInsets.all(18.0),
                   child: Text("Todays sessions"),
                 ),
-                Container(
+                SizedBox(
                   height: 700,
                   child: FutureBuilder(
                     future: HttpService().getSessions(),
                     builder: (context, AsyncSnapshot snapshot) {
                       if (snapshot.hasData) {
-                        if (snapshot.data[snapshot.data.length - 1]
-                                ['session'] ==
-                            "IN") {
-                          alreadyIn = true;
-                        }
+                        // if (snapshot.data[snapshot.data.length - 1]
+                        //         ['session'] ==
+                        //     "IN") {
+                        //   alreadyIn = true;
+                        // }
 
                         return ListView.builder(
                             scrollDirection: Axis.vertical,
                             itemCount: snapshot.data.length,
                             itemBuilder: (context, index) {
                               return Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color:
-                                            Color.fromARGB(96, 210, 217, 230),
-                                        blurRadius: 2,
-                                        spreadRadius: 2,
-                                        offset: Offset.zero,
-                                        blurStyle: BlurStyle.normal)
-                                  ],
-                                  border: Border(
-                                    bottom: BorderSide(
-                                        width: .2,
-                                        color: Colors.lightBlue.shade900),
-                                  ),
-                                ),
+                                decoration: const BoxDecoration(),
                                 child: ListTile(
-                                  trailing: Icon(
+                                  trailing: const Icon(
                                     Icons.photo,
                                     color: Colors.blue,
                                   ),
@@ -277,7 +303,7 @@ class _HomeState extends State<Home> {
                                   subtitle:
                                       Text(snapshot.data[index]['date_time']),
                                   leading: Container(
-                                    margin: EdgeInsets.only(top: 5),
+                                    margin: const EdgeInsets.only(top: 5),
                                     decoration: BoxDecoration(
                                         color: snapshot.data[index]
                                                     ['session'] ==
@@ -293,12 +319,11 @@ class _HomeState extends State<Home> {
                               );
                             });
                       } else {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
                     },
                   ),
                 ),
-                Text("end")
               ],
             ),
           );
@@ -311,49 +336,86 @@ class _HomeState extends State<Home> {
 
     return SafeArea(
       child: Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.arrow_upward_sharp),
-          onPressed: () {
-            bottomModalSheet();
-          },
-        ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        // floatingActionButton: FloatingActionButton(
+        //   child: Icon(Icons.arrow_upward_sharp),
+        //   onPressed: () {
+        //     bottomModalSheet();
+        //   },
+        // ),
         appBar: headerNav(),
         drawer: const MyDrawer(),
-        body: SingleChildScrollView(
+        body: Stack(children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: GoogleMap(
+                minMaxZoomPreference: const MinMaxZoomPreference(15, 1000),
+                zoomControlsEnabled: true,
+                myLocationEnabled: true,
+                zoomGesturesEnabled: true,
+                myLocationButtonEnabled: true,
+                onMapCreated: _onMapCreated,
+                onCameraMove: (CameraPosition position) {
+                  _cameraPosition = position.target;
+                  _mapZoom = position.zoom;
+                },
+                markers: _markers,
+                circles: circles,
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: _mapZoom,
+                )),
+          ),
+          HeaderButtons(inLoginZone: inLoginZone, alreadyIn: alreadyIn),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 1,
+            child: DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.30,
+              minChildSize: 0.15,
+              builder:
+                  (BuildContext context, ScrollController scrollController) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  child: const CustomScrollViewContent(),
+                );
+              },
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+class HeaderButtons extends StatelessWidget {
+  const HeaderButtons(
+      {Key? key, required this.inLoginZone, required this.alreadyIn})
+      : super(key: key);
+
+  final bool inLoginZone;
+  final bool alreadyIn;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: FittedBox(
+        child: Card(
+          elevation: 6,
           child: Container(
-            margin: const EdgeInsets.only(top: 0),
-            padding: const EdgeInsets.all(10),
-            child: Column(children: [
-              OutOfRadiusMessage(
-                inLoginZone: inLoginZone,
-              ),
-              LoginButtons(inLoginZone: inLoginZone),
-              const SizedBox(height: 10),
-              RadiusInfoChips(),
-              const SizedBox(height: 10),
-              Container(
-                margin: const EdgeInsets.only(top: 10),
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: GoogleMap(
-                    minMaxZoomPreference: const MinMaxZoomPreference(15, 1000),
-                    zoomControlsEnabled: true,
-                    myLocationEnabled: true,
-                    zoomGesturesEnabled: true,
-                    myLocationButtonEnabled: true,
-                    onMapCreated: _onMapCreated,
-                    onCameraMove: (CameraPosition position) {
-                      _cameraPosition = position.target;
-                      _mapZoom = position.zoom;
-                    },
-                    markers: _markers,
-                    circles: circles,
-                    initialCameraPosition: CameraPosition(
-                      target: _center,
-                      zoom: _mapZoom,
-                    )),
-              ),
-            ]),
+            color: Colors.white,
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              children: [
+                OutOfRadiusMessage(
+                  inLoginZone: inLoginZone,
+                ),
+                LoginButtons(inLoginZone: inLoginZone, alreadyIn: alreadyIn),
+                const SizedBox(height: 10),
+                const RadiusInfoChips(),
+              ],
+            ),
           ),
         ),
       ),
@@ -403,18 +465,18 @@ class RadiusInfoChips extends StatelessWidget {
 }
 
 class LoginButtons extends StatelessWidget {
-  const LoginButtons({
-    Key? key,
-    required this.inLoginZone,
-  }) : super(key: key);
+  const LoginButtons(
+      {Key? key, required this.inLoginZone, required this.alreadyIn})
+      : super(key: key);
 
   final bool inLoginZone;
+  final bool alreadyIn;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(3),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         SizedBox(
             height: 50,
             width: MediaQuery.of(context).size.width * 0.4,
@@ -423,38 +485,48 @@ class LoginButtons extends StatelessWidget {
                     shadowColor: Colors.green,
                     primary: const Color.fromARGB(221, 27, 202, 65)),
                 onPressed: inLoginZone
-                    ? () async {
-                        await availableCameras().then((value) => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CameraPage(
-                                session: "IN",
-                                cameras: value,
-                              ),
-                            )));
-                      }
+                    ? !alreadyIn
+                        ? () async {
+                            await availableCameras()
+                                .then((value) => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CameraPage(
+                                        session: "IN",
+                                        cameras: value,
+                                      ),
+                                    )));
+                          }
+                        : null
                     : null,
                 child: const Text(
                   "IN",
                   style: TextStyle(fontSize: 25),
                 ))),
+        const SizedBox(
+          width: 30,
+        ),
         SizedBox(
             height: 50,
             width: MediaQuery.of(context).size.width * 0.4,
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     primary: const Color.fromARGB(226, 244, 67, 54)),
-                onPressed: //inLoginZone
-                    () async {
-                  await availableCameras().then((value) => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CameraPage(
-                          session: "OUT",
-                          cameras: value,
-                        ),
-                      )));
-                },
+                onPressed: inLoginZone
+                    ? alreadyIn
+                        ? () async {
+                            await availableCameras()
+                                .then((value) => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CameraPage(
+                                        session: "OUT",
+                                        cameras: value,
+                                      ),
+                                    )));
+                          }
+                        : null
+                    : null,
                 child: const Text("OUT", style: TextStyle(fontSize: 25)))),
       ]),
     );
@@ -463,7 +535,8 @@ class LoginButtons extends StatelessWidget {
 
 class OutOfRadiusMessage extends StatelessWidget {
   final bool inLoginZone;
-  OutOfRadiusMessage({required this.inLoginZone});
+  const OutOfRadiusMessage({Key? key, required this.inLoginZone})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Visibility(
@@ -490,6 +563,247 @@ class OutOfRadiusMessage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Content of the DraggableBottomSheet's child SingleChildScrollView
+class CustomScrollViewContent extends StatelessWidget {
+  const CustomScrollViewContent({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 12.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      margin: const EdgeInsets.all(0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: const CustomInnerContent(),
+      ),
+    );
+  }
+}
+
+class CustomInnerContent extends StatelessWidget {
+  const CustomInnerContent({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const <Widget>[
+        SizedBox(height: 12),
+        CustomDraggingHandle(),
+        SizedBox(height: 16),
+        MySitesTitle(),
+        SizedBox(height: 16),
+        MySites(),
+        SizedBox(height: 24),
+        SessionList(),
+        SizedBox(height: 16),
+        TodaysSessionsListView(),
+        SizedBox(height: 24),
+      ],
+    );
+  }
+}
+
+class CustomDraggingHandle extends StatelessWidget {
+  const CustomDraggingHandle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 5,
+      width: 30,
+      decoration: BoxDecoration(
+          color: Colors.grey[200], borderRadius: BorderRadius.circular(16)),
+    );
+  }
+}
+
+class MySitesTitle extends StatelessWidget {
+  const MySitesTitle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        const Text("My Sites",
+            style: TextStyle(fontSize: 22, color: Colors.black45)),
+        const SizedBox(width: 8),
+        Container(
+          height: 30,
+          width: 30,
+          child: const Icon(Icons.map, size: 12, color: Colors.black54),
+          decoration: BoxDecoration(
+              color: Colors.grey[200], borderRadius: BorderRadius.circular(16)),
+        ),
+      ],
+    );
+  }
+}
+
+class MySites extends StatelessWidget {
+  const MySites({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: const <Widget>[
+            CustomSiteChip(
+              title: "Site A",
+            ),
+            SizedBox(width: 12),
+            CustomSiteChip(
+              title: "Site B",
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SessionList extends StatelessWidget {
+  const SessionList({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16),
+      //only to left align the text
+      child: Row(
+        children: const <Widget>[
+          Text("Today's sessions", style: TextStyle(fontSize: 14))
+        ],
+      ),
+    );
+  }
+}
+
+class TodaysSessionsListView extends StatefulWidget {
+  const TodaysSessionsListView({Key? key}) : super(key: key);
+
+  @override
+  State<TodaysSessionsListView> createState() => _TodaysSessionsListViewState();
+}
+
+class _TodaysSessionsListViewState extends State<TodaysSessionsListView> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.only(left: 25, right: 25, bottom: 10),
+          height: 700,
+          child: FutureBuilder(
+            future: HttpService().getSessions(),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData) {
+                // if (snapshot.data[snapshot.data.length - 1]
+                //         ['session'] ==
+                //     "IN") {
+                //   alreadyIn = true;
+                // }
+
+                return ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          boxShadow: const [
+                            BoxShadow(
+                                color: Color.fromARGB(10, 11, 70, 180),
+                                blurRadius: 2,
+                                spreadRadius: 2,
+                                offset: Offset.zero,
+                                blurStyle: BlurStyle.normal)
+                          ],
+                          border: Border(
+                            bottom: BorderSide(
+                                width: .2, color: Colors.lightBlue.shade900),
+                          ),
+                        ),
+                        child: ListTile(
+                          title: Text(snapshot.data[index]['session']),
+                          subtitle: Text(snapshot.data[index]['date_time']),
+                          leading: Container(
+                            margin: const EdgeInsets.only(top: 5),
+                            decoration: BoxDecoration(
+                                color: snapshot.data[index]['session'] == "IN"
+                                    ? Colors.green
+                                    : Colors.red,
+                                borderRadius: BorderRadius.circular(50)),
+                            width: 20,
+                            height: 20,
+                          ),
+                        ),
+                      );
+                    });
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CustomSiteChip extends StatelessWidget {
+  final String title;
+
+  const CustomSiteChip({Key? key, required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        height: 50,
+        width: 120,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(40, 33, 149, 243),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              color: Colors.black,
+              icon: const Icon(Icons.pin_drop),
+              onPressed: () {},
+            ),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.black),
+            )
+          ],
+        ));
+  }
+}
+
+class CustomFeaturedItem extends StatelessWidget {
+  const CustomFeaturedItem({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const ListTile(
+      title: Text("Test"),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hrms_app/views/sos_tracking_page.dart';
 import 'package:hrms_app/widgets/drawer.dart';
 import '../widgets/appbar.dart';
 
@@ -73,9 +74,6 @@ class _SosState extends State<Sos> with TickerProviderStateMixin {
                           children: <Widget>[
                             _buildContainer(150 * 1),
                             _buildContainer(200 * _controller.value),
-                            _buildContainer(250 * _controller.value),
-                            _buildContainer(300 * _controller.value),
-                            _buildContainer(350 * _controller.value),
                             const Align(
                                 child: Text(
                               "",
@@ -97,7 +95,10 @@ class _SosState extends State<Sos> with TickerProviderStateMixin {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const SosTrackingPage()));
+                      },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.red,
                         fixedSize: const Size(200, 200),

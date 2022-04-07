@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hrms_app/main.dart';
-import 'package:hrms_app/views/login.dart';
 import 'package:hrms_app/services/my_shared_prederences.dart';
 import 'package:hrms_app/widgets/custom_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,8 +31,10 @@ class _SettingsState extends State<Settings> {
     if (loggedIn != null) {
       setState(() {
         loggedin = loggedIn;
-        _countryCode = prefs.getString('_countryCode')!;
-        _selected = prefs.getString('_selectedLanguage')!;
+        if (prefs.containsKey("_countryCode")) {
+          _countryCode = prefs.getString('_countryCode')!;
+          _selected = prefs.getString('_selectedLanguage')!;
+        }
       });
       // BioAuth();
     }

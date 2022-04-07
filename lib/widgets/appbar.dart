@@ -11,7 +11,6 @@ AppBar headerNav() {
           fontWeight: FontWeight.bold),
     ),
     centerTitle: true,
-    backgroundColor: Color(0xFF0098c2),
-    elevation: 0,
+    backgroundColor: const Color(0xFF0098c2),
   );
 }

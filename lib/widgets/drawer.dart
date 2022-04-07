@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hrms_app/main.dart';
 import 'package:hrms_app/services/auth.dart';
 import 'package:hrms_app/views/settings_page.dart';
 import 'package:hrms_app/views/sos.dart';
@@ -9,69 +10,84 @@ class MyDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final drawerItems = Container(
-      decoration: BoxDecoration(color: Color(0xFF0098c2)),
+      decoration: const BoxDecoration(color: Color(0xFF0098c2)),
       child: Column(
         children: <Widget>[
           Expanded(
             child: Column(children: <Widget>[
               ListTile(
-                title: Text(
+                title: const Text(
+                  'Home',
+                  style: TextStyle(fontSize: 18.0, color: Colors.white),
+                ),
+                leading: const Icon(
+                  Icons.location_pin,
+                  size: 20.0,
+                  color: Colors.white,
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const MyHomePage()));
+                },
+              ),
+              ListTile(
+                title: const Text(
                   'Language',
                   style: TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
-                leading: Icon(
+                leading: const Icon(
                   Icons.language,
                   size: 20.0,
                   color: Colors.white,
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.of(context).push(
-                      new MaterialPageRoute(builder: (context) => Settings()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const Settings()));
                 },
               ),
               ListTile(
-                title: Text(
+                title: const Text(
                   'Help',
                   style: TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
-                leading: Icon(
+                leading: const Icon(
                   Icons.help,
                   size: 20.0,
                   color: Colors.white,
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.of(context)
-                      .push(new MaterialPageRoute(builder: (context) => Sos()));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const Sos()));
                 },
               ),
             ]),
           ),
-          Container(
-              child: Align(
-                  alignment: FractionalOffset.bottomCenter,
-                  child: Column(
-                    children: <Widget>[
-                      Divider(),
-                      ListTile(
-                          title: Text(
-                            'Signout',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          onTap: () {
-                            var authProvider = AuthService();
-                            authProvider.logout(context);
-                          },
-                          trailing: Icon(
-                            Icons.power_settings_new,
+          Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: Column(
+                children: <Widget>[
+                  const Divider(),
+                  ListTile(
+                      title: const Text(
+                        'Signout',
+                        style: TextStyle(
                             color: Colors.white,
-                          )),
-                    ],
-                  ))),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
+                      ),
+                      onTap: () {
+                        var authProvider = AuthService();
+                        authProvider.logout(context);
+                      },
+                      trailing: const Icon(
+                        Icons.power_settings_new,
+                        color: Colors.white,
+                      )),
+                ],
+              )),
         ],
       ),
     );

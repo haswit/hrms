@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_app/main.dart';
 import 'package:hrms_app/views/home.dart';
@@ -80,7 +80,6 @@ class HttpService {
   }
 
   Future<List<dynamic>> getSessions() async {
-    var data = {};
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? id = prefs.getString("id");
 
@@ -88,24 +87,28 @@ class HttpService {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
     final String date = formatter.format(now);
+    try {
+      http.Response response = await _client
+          .post(Uri.parse('http://lghrms.live/get-session'), body: {
+        "id": id,
+        "date": date,
+      });
 
-    http.Response response =
-        await _client.post(Uri.parse('http://lghrms.live/get-session'), body: {
-      "id": id,
-      "date": date,
-    });
-
-    if (response.statusCode == 200) {
-      var json = jsonDecode(response.body);
-      return json['data'];
-    } else {
+      if (response.statusCode == 200) {
+        var json = jsonDecode(response.body);
+        return json['data'];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("$e \nError while fetching data");
       return [];
     }
   }
 
   static submitSession(
-      context, String login_session, String time, String date, image) async {
-    final String baseUrl = "https://lghrms.live/";
+      context, String loginSession, String time, String date, image) async {
+    const String baseUrl = "https://lghrms.live/";
 
     var url = baseUrl + "add-session";
 
@@ -114,7 +117,7 @@ class HttpService {
           http.MultipartRequest('POST', Uri.parse(url));
       request.fields.addAll({
         "id": id,
-        "login_session": login_session,
+        "login_session": loginSession,
         "date_time": date + " " + time,
       });
       request.files.add(
@@ -125,13 +128,44 @@ class HttpService {
         ),
       );
       http.StreamedResponse r = await request.send();
-      print(r.statusCode);
-      print("===================${r.statusCode}");
 
       if (r.statusCode == 200) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyHomePage()));
+        await EasyLoading.showSuccess("Submitted Successfully");
+
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const MyHomePage()));
       }
     });
+  }
+
+  static submitLocationTracking(status) async {
+    if (kDebugMode) {
+      print("SUBMITTING NEW SESSION $status");
+    }
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? id = prefs.getString("id");
+
+    final DateTime now = DateTime.now();
+
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final DateFormat formatterTime = DateFormat('Hm');
+
+    final String formatted = formatter.format(now);
+    final String _formatterTime = formatterTime.format(now);
+    try {
+      http.Response response = await _client
+          .post(Uri.parse('http://lghrms.live/add-geofence-log'), body: {
+        "id": id,
+        "date_time": "$formatted $_formatterTime",
+        "status": status.toString()
+      });
+      if (response.statusCode == 200) {}
+    } catch (e) {
+      if (kDebugMode) {
+        print(""""Couldn't add geofence log""");
+        print(e);
+      }
+    }
   }
 }
