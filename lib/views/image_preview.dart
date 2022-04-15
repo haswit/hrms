@@ -24,7 +24,7 @@ class Picture extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-          appBar: headerNav(),
+          appBar: headerNav("SUBMIT SESSION"),
           drawer: const MyDrawer(),
           body: SingleChildScrollView(
             child: Column(

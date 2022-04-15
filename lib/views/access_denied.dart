@@ -13,7 +13,7 @@ class AccessDenied extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-            appBar: headerNav(),
+            appBar: headerNav("ACCESS DENIED"),
             body: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

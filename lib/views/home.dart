@@ -188,13 +188,13 @@ class _HomeState extends State<Home> {
     var _sessionsData = HttpService().getSessions();
     _sessionsData.then((value) {
       print(
-          "\n\n\n\n\n\============================================\ndata has been fethed");
+          "\n\n\n\n\n============================================\ndata has been fethed");
       if (value.length > 1) {
         print(value[value.length - 1]['session']);
 
         if (value[value.length - 1]['session'] == "IN") {
           setState(() {
-            alreadyIn = true;
+            //alreadyIn = true;
           });
         }
       }
@@ -243,13 +243,13 @@ class _HomeState extends State<Home> {
       getLocation();
       circles = {
         Circle(
-            fillColor: const Color.fromARGB(57, 4, 245, 16),
+            fillColor: Color.fromARGB(76, 245, 133, 4),
             circleId: const CircleId("one"),
             center: mapCircle,
             radius: _outerRadius,
             strokeColor: const Color.fromARGB(0, 33, 149, 243)),
         Circle(
-            fillColor: const Color.fromARGB(136, 245, 133, 4),
+            fillColor: Color.fromARGB(127, 4, 245, 16),
             circleId: const CircleId("one"),
             center: mapCircle,
             radius: _innerRadius,
@@ -343,46 +343,69 @@ class _HomeState extends State<Home> {
         //     bottomModalSheet();
         //   },
         // ),
-        appBar: headerNav(),
+        appBar: headerNav("ATTENDANCE"),
         drawer: const MyDrawer(),
-        body: Stack(children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.9,
-            child: GoogleMap(
-                minMaxZoomPreference: const MinMaxZoomPreference(15, 1000),
-                zoomControlsEnabled: true,
-                myLocationEnabled: true,
-                zoomGesturesEnabled: true,
-                myLocationButtonEnabled: true,
-                onMapCreated: _onMapCreated,
-                onCameraMove: (CameraPosition position) {
-                  _cameraPosition = position.target;
-                  _mapZoom = position.zoom;
-                },
-                markers: _markers,
-                circles: circles,
-                initialCameraPosition: CameraPosition(
-                  target: _center,
-                  zoom: _mapZoom,
-                )),
+        body: Container(
+          color: Colors.white,
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Stack(children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.74,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      right: 25,
+                      left: 25,
+                      top: MediaQuery.of(context).size.height * 0.18),
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey, width: 1)),
+                    child: GoogleMap(
+                        minMaxZoomPreference:
+                            const MinMaxZoomPreference(15, 1000),
+                        zoomControlsEnabled: true,
+                        myLocationEnabled: true,
+                        zoomGesturesEnabled: true,
+                        myLocationButtonEnabled: true,
+                        onMapCreated: _onMapCreated,
+                        onCameraMove: (CameraPosition position) {
+                          _cameraPosition = position.target;
+                          _mapZoom = position.zoom;
+                        },
+                        markers: _markers,
+                        circles: circles,
+                        initialCameraPosition: CameraPosition(
+                          target: _center,
+                          zoom: _mapZoom,
+                        )),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  width: MediaQuery.of(context).size.width,
+                  child: DraggableScrollableSheet(
+                    expand: false,
+                    initialChildSize: 0.30,
+                    minChildSize: 0.15,
+                    builder: (BuildContext context,
+                        ScrollController scrollController) {
+                      return SingleChildScrollView(
+                        controller: scrollController,
+                        child: const CustomScrollViewContent(),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              HeaderButtons(inLoginZone: inLoginZone, alreadyIn: alreadyIn),
+            ]),
           ),
-          HeaderButtons(inLoginZone: inLoginZone, alreadyIn: alreadyIn),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 1,
-            child: DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: 0.30,
-              minChildSize: 0.15,
-              builder:
-                  (BuildContext context, ScrollController scrollController) {
-                return SingleChildScrollView(
-                  controller: scrollController,
-                  child: const CustomScrollViewContent(),
-                );
-              },
-            ),
-          ),
-        ]),
+        ),
       ),
     );
   }
@@ -402,7 +425,8 @@ class HeaderButtons extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       child: FittedBox(
         child: Card(
-          elevation: 6,
+          shadowColor: Colors.white,
+          elevation: 4,
           child: Container(
             color: Colors.white,
             padding: const EdgeInsets.all(15.0),
@@ -439,7 +463,7 @@ class RadiusInfoChips extends StatelessWidget {
             Container(
               margin: const EdgeInsets.only(right: 10, left: 20),
               decoration: const BoxDecoration(
-                  color: Color.fromARGB(131, 244, 132, 3),
+                  color: Color.fromARGB(167, 27, 202, 65),
                   borderRadius: BorderRadius.all(Radius.circular(20))),
               height: 20,
               width: 20,
@@ -451,7 +475,7 @@ class RadiusInfoChips extends StatelessWidget {
             Container(
               margin: const EdgeInsets.only(right: 10, left: 20),
               decoration: const BoxDecoration(
-                  color: Color.fromARGB(167, 27, 202, 65),
+                  color: Color.fromARGB(131, 244, 132, 3),
                   borderRadius: BorderRadius.all(Radius.circular(20))),
               height: 20,
               width: 20,
@@ -513,7 +537,7 @@ class LoginButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                     primary: const Color.fromARGB(226, 244, 67, 54)),
                 onPressed: inLoginZone
-                    ? alreadyIn
+                    ? !alreadyIn
                         ? () async {
                             await availableCameras()
                                 .then((value) => Navigator.push(
@@ -574,12 +598,14 @@ class CustomScrollViewContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 12.0,
+      elevation: 10,
+      shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       margin: const EdgeInsets.all(0),
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24), topRight: Radius.circular(24)),
         ),
         child: const CustomInnerContent(),
       ),
@@ -679,7 +705,7 @@ class SessionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16),
+      padding: const EdgeInsets.only(left: 44, right: 44),
       //only to left align the text
       child: Row(
         children: const <Widget>[
@@ -708,8 +734,8 @@ class _TodaysSessionsListViewState extends State<TodaysSessionsListView> {
     return Column(
       children: [
         Container(
+          height: MediaQuery.of(context).size.height * 0.3,
           padding: const EdgeInsets.only(left: 25, right: 25, bottom: 10),
-          height: 700,
           child: FutureBuilder(
             future: HttpService().getSessions(),
             builder: (context, AsyncSnapshot snapshot) {
@@ -726,14 +752,6 @@ class _TodaysSessionsListViewState extends State<TodaysSessionsListView> {
                     itemBuilder: (context, index) {
                       return Container(
                         decoration: BoxDecoration(
-                          boxShadow: const [
-                            BoxShadow(
-                                color: Color.fromARGB(10, 11, 70, 180),
-                                blurRadius: 2,
-                                spreadRadius: 2,
-                                offset: Offset.zero,
-                                blurStyle: BlurStyle.normal)
-                          ],
                           border: Border(
                             bottom: BorderSide(
                                 width: .2, color: Colors.lightBlue.shade900),

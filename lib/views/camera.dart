@@ -50,7 +50,7 @@ class _CameraPageState extends State<CameraPage> {
     }
     return SafeArea(
       child: Scaffold(
-        appBar: headerNav(),
+        appBar: headerNav("CAPTURE IMAGE"),
         drawer: const MyDrawer(),
         body: Column(
           children: [
@@ -69,7 +69,7 @@ class _CameraPageState extends State<CameraPage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => Picture(
-                        session : widget.session,
+                            session: widget.session,
                             pictureFile: pictureFile,
                           )),
                 );

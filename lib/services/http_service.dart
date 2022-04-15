@@ -168,4 +168,84 @@ class HttpService {
       }
     }
   }
+
+  static submitAudio(context, path) async {
+    const String baseUrl = "https://lghrms.live/";
+
+    print("Submitting audio $path");
+
+    var url = baseUrl + "add-audio";
+
+    MySharedPreferences.instance.getStringValue("id").then((id) async {
+      http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse(url));
+
+      request.fields.addAll({
+        "id": id,
+        "sos_id": "sos_id",
+        "_type": "_type",
+        "date_time": "date + " + " + time",
+      });
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'audiofile',
+          path,
+          contentType: MediaType('application', 'mp3'),
+        ),
+      );
+      http.StreamedResponse r = await request.send();
+
+      if (r.statusCode == 200) {
+        await EasyLoading.showSuccess("Submitted Successfully");
+
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const MyHomePage()));
+      } else {
+        print(r.statusCode);
+        print(r.toString());
+        print("Something went wrong");
+      }
+    });
+  }
+
+static submitImage(
+      context,image) async {
+    const String baseUrl = "https://lghrms.live/";
+
+    var url = baseUrl + "add-image";
+final DateTime now = DateTime.now();
+
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final DateFormat formatterTime = DateFormat('Hm');
+
+    final String formatted = formatter.format(now);
+    final String _formatterTime = formatterTime.format(now);
+    
+    MySharedPreferences.instance.getStringValue("id").then((id) async {
+      http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse(url));
+      request.fields.addAll({
+        "id": id,
+        "type": "image",
+        "date_time": "$formatted $_formatterTime",
+      });
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'images',
+          image?.path,
+          contentType: MediaType('application', 'jpeg'),
+        ),
+      );
+      http.StreamedResponse r = await request.send();
+
+      if (r.statusCode == 200) {
+        await EasyLoading.showSuccess("Submitted Successfully");
+
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const MyHomePage()));
+      }
+    });
+  }
+  
 }

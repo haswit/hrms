@@ -17,7 +17,7 @@ class MyDrawer extends StatelessWidget {
             child: Column(children: <Widget>[
               ListTile(
                 title: const Text(
-                  'Home',
+                  'Attendance',
                   style: TextStyle(fontSize: 18.0, color: Colors.white),
                 ),
                 leading: const Icon(

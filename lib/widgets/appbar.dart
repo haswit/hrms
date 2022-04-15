@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-AppBar headerNav() {
+AppBar headerNav(String? title) {
   return AppBar(
     iconTheme: const IconThemeData(color: Color.fromARGB(255, 255, 255, 255)),
-    title: const Text(
-      "HRMS",
+    title: Text(
+      title ?? "HRMS",
       style: TextStyle(
           color: Color.fromARGB(228, 255, 255, 255),
           fontSize: 25,

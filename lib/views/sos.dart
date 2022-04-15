@@ -1,7 +1,9 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_app/views/sos_tracking_page.dart';
 import 'package:hrms_app/widgets/drawer.dart';
 import '../widgets/appbar.dart';
+import 'camera.dart';
 
 class Sos extends StatefulWidget {
   const Sos({Key? key}) : super(key: key);
@@ -34,7 +36,7 @@ class _SosState extends State<Sos> with TickerProviderStateMixin {
     return SafeArea(
       child: Scaffold(
         drawer: const MyDrawer(),
-        appBar: headerNav(),
+        appBar: headerNav("HELP"),
         body: Container(
           padding:
               EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.17),
@@ -95,9 +97,14 @@ class _SosState extends State<Sos> with TickerProviderStateMixin {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const SosTrackingPage()));
+                      onPressed: () async {
+                        await availableCameras().then((value) => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SosTrackingPage(
+                                cameras: value,
+                              ),
+                            )));
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.red,
