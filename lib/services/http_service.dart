@@ -33,6 +33,8 @@ class HttpService {
         MySharedPreferences.instance
             .setStringValue("cin", user['cin'].toString());
 
+        MySharedPreferences.instance.setStringValue("id", id);
+
         MySharedPreferences.instance
             .setDoubleValue("latitude", user['latitude']);
         MySharedPreferences.instance
@@ -101,7 +103,9 @@ class HttpService {
         return [];
       }
     } catch (e) {
-      print("$e \nError while fetching data");
+      if (kDebugMode) {
+        print("$e \nError while fetching data");
+      }
       return [];
     }
   }
@@ -172,7 +176,6 @@ class HttpService {
   static submitAudio(context, path) async {
     const String baseUrl = "https://lghrms.live/";
 
-    print("Submitting audio $path");
 
     var url = baseUrl + "add-audio";
 
@@ -184,7 +187,7 @@ class HttpService {
         "id": id,
         "sos_id": "sos_id",
         "_type": "_type",
-        "date_time": "date + " + " + time",
+        "date_time": "date + " " + time",
       });
 
       request.files.add(
@@ -202,26 +205,27 @@ class HttpService {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const MyHomePage()));
       } else {
-        print(r.statusCode);
-        print(r.toString());
-        print("Something went wrong");
+        if (kDebugMode) {
+          print(r.statusCode);
+          print(r.toString());
+          print("Something went wrong");
+        }
       }
     });
   }
 
-static submitImage(
-      context,image) async {
+  static submitImage(context, image) async {
     const String baseUrl = "https://lghrms.live/";
 
     var url = baseUrl + "add-image";
-final DateTime now = DateTime.now();
+    final DateTime now = DateTime.now();
 
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     final DateFormat formatterTime = DateFormat('Hm');
 
     final String formatted = formatter.format(now);
     final String _formatterTime = formatterTime.format(now);
-    
+
     MySharedPreferences.instance.getStringValue("id").then((id) async {
       http.MultipartRequest request =
           http.MultipartRequest('POST', Uri.parse(url));
@@ -247,5 +251,4 @@ final DateTime now = DateTime.now();
       }
     });
   }
-  
 }

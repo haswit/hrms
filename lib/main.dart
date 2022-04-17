@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:hrms_app/views/home.dart';
+import 'package:hrms_app/views/home_screen.dart';
 import 'package:hrms_app/views/login.dart';
 import 'package:hrms_app/views/settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,21 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool languageSelected = false;
   bool isLoggedIn = false;
 
-  late final double? latitude;
-  late final double? longitude;
-  late final double? gain;
-  late final double? innerRadius;
-  late final double? outerRadius;
-
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      latitude = prefs.getDouble('latitude');
-      longitude = prefs.getDouble('longitude');
-      gain = prefs.getDouble('gain');
-      innerRadius = prefs.getDouble('innerRadius');
-      outerRadius = prefs.getDouble('outerRadius');
-    });
 
     var selected = prefs.getString('_selectedLanguage');
     if (selected != "") {
@@ -155,12 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ? const Settings()
                     : !isLoggedIn
                         ? const Login()
-                        : Home(
-                            latitude: latitude!,
-                            longitude: longitude!,
-                            gain: gain!,
-                            innerRadius: innerRadius!,
-                            outerRadius: outerRadius!,
-                          )));
+                        : const HomeScreen()));
   }
 }
+
+

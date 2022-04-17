@@ -24,30 +24,33 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
   late CameraController controller;
   XFile? pictureFile;
   late String _message;
+  // ignore: prefer_typing_uninitialized_variables
   var filepath;
+  // ignore: prefer_typing_uninitialized_variables
   var path;
 
   late List<Widget> timelineItems = [];
   late List<Widget> indicatorIcons = [];
 
-  Future<Null> updatedShowPlayyer(StateSetter updateState, value) async {
+  Future<void> updatedShowPlayyer(StateSetter updateState, value) async {
     updateState(() {
       showPlayer = value;
     });
   }
 
-  Future<Null> updateMessageState(StateSetter updateState, value) async {
+  Future<void> updateMessageState(StateSetter updateState, value) async {
     updateState(() {
       _message = value;
     });
   }
 
-  Future<Null> updatedPath(StateSetter updateState, value) async {
+  Future<void> updatedPath(StateSetter updateState, value) async {
     updateState(() {
       path = value;
     });
   }
 
+  // ignore: non_constant_identifier_names
   var sos_data = [
     {"id": 1, "type": "message", "content": "Hi", "date_time": "20-11-2022"},
     {
@@ -117,7 +120,6 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
       ),
     ));
   }
-  
 
   SizedBox markAsResolved(BuildContext context) {
     return SizedBox(
@@ -281,9 +283,6 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
                             child: showPlayer
                                 ? ElevatedButton(
                                     onPressed: () {
-                                      print(
-                                          "Filepath============================");
-                                      print(filepath);
                                       HttpService.submitAudio(
                                           context, filepath);
                                     },

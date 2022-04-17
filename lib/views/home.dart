@@ -2,6 +2,7 @@ import 'package:cron/cron.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/views/gps_alert.dart';
+import 'package:hrms_app/views/home_screen.dart';
 import 'package:hrms_app/views/notifications.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as tk;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -187,11 +188,7 @@ class _HomeState extends State<Home> {
 
     var _sessionsData = HttpService().getSessions();
     _sessionsData.then((value) {
-      print(
-          "\n\n\n\n\n============================================\ndata has been fethed");
       if (value.length > 1) {
-        print(value[value.length - 1]['session']);
-
         if (value[value.length - 1]['session'] == "IN") {
           setState(() {
             //alreadyIn = true;
@@ -243,13 +240,13 @@ class _HomeState extends State<Home> {
       getLocation();
       circles = {
         Circle(
-            fillColor: Color.fromARGB(76, 245, 133, 4),
+            fillColor: const Color.fromARGB(76, 245, 133, 4),
             circleId: const CircleId("one"),
             center: mapCircle,
             radius: _outerRadius,
             strokeColor: const Color.fromARGB(0, 33, 149, 243)),
         Circle(
-            fillColor: Color.fromARGB(127, 4, 245, 16),
+            fillColor: const Color.fromARGB(127, 4, 245, 16),
             circleId: const CircleId("one"),
             center: mapCircle,
             radius: _innerRadius,
@@ -336,77 +333,86 @@ class _HomeState extends State<Home> {
 
     return SafeArea(
       child: Scaffold(
-        // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        // floatingActionButton: FloatingActionButton(
-        //   child: Icon(Icons.arrow_upward_sharp),
-        //   onPressed: () {
-        //     bottomModalSheet();
-        //   },
-        // ),
-        appBar: headerNav("ATTENDANCE"),
-        drawer: const MyDrawer(),
-        body: Container(
-          color: Colors.white,
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Stack(children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.74,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      right: 25,
-                      left: 25,
-                      top: MediaQuery.of(context).size.height * 0.18),
-                  child: Container(
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: Colors.grey, width: 1)),
-                    child: GoogleMap(
-                        minMaxZoomPreference:
-                            const MinMaxZoomPreference(15, 1000),
-                        zoomControlsEnabled: true,
-                        myLocationEnabled: true,
-                        zoomGesturesEnabled: true,
-                        myLocationButtonEnabled: true,
-                        onMapCreated: _onMapCreated,
-                        onCameraMove: (CameraPosition position) {
-                          _cameraPosition = position.target;
-                          _mapZoom = position.zoom;
-                        },
-                        markers: _markers,
-                        circles: circles,
-                        initialCameraPosition: CameraPosition(
-                          target: _center,
-                          zoom: _mapZoom,
-                        )),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
+          // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+          // floatingActionButton: FloatingActionButton(
+          //   child: Icon(Icons.arrow_upward_sharp),
+          //   onPressed: () {
+          //     bottomModalSheet();
+          //   },
+          // ),
+          appBar: headerNav("ATTENDANCE"),
+          drawer: const MyDrawer(),
+          body: Container(
+            child: WillPopScope(
+              onWillPop: () async {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()));
+                return true;
+              },
+              child: Container(
+                color: Colors.white,
                 child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  width: MediaQuery.of(context).size.width,
-                  child: DraggableScrollableSheet(
-                    expand: false,
-                    initialChildSize: 0.30,
-                    minChildSize: 0.15,
-                    builder: (BuildContext context,
-                        ScrollController scrollController) {
-                      return SingleChildScrollView(
-                        controller: scrollController,
-                        child: const CustomScrollViewContent(),
-                      );
-                    },
-                  ),
+                  height: MediaQuery.of(context).size.height,
+                  child: Stack(children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.74,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                            right: 25,
+                            left: 25,
+                            top: MediaQuery.of(context).size.height * 0.18),
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: Colors.grey, width: 1)),
+                          child: GoogleMap(
+                              minMaxZoomPreference:
+                                  const MinMaxZoomPreference(15, 1000),
+                              zoomControlsEnabled: true,
+                              myLocationEnabled: true,
+                              zoomGesturesEnabled: true,
+                              myLocationButtonEnabled: true,
+                              onMapCreated: _onMapCreated,
+                              onCameraMove: (CameraPosition position) {
+                                _cameraPosition = position.target;
+                                _mapZoom = position.zoom;
+                              },
+                              markers: _markers,
+                              circles: circles,
+                              initialCameraPosition: CameraPosition(
+                                target: _center,
+                                zoom: _mapZoom,
+                              )),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        width: MediaQuery.of(context).size.width,
+                        child: DraggableScrollableSheet(
+                          expand: false,
+                          initialChildSize: 0.30,
+                          minChildSize: 0.15,
+                          builder: (BuildContext context,
+                              ScrollController scrollController) {
+                            return SingleChildScrollView(
+                              controller: scrollController,
+                              child: const CustomScrollViewContent(),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    HeaderButtons(
+                        inLoginZone: inLoginZone, alreadyIn: alreadyIn),
+                  ]),
                 ),
               ),
-              HeaderButtons(inLoginZone: inLoginZone, alreadyIn: alreadyIn),
-            ]),
-          ),
-        ),
-      ),
+            ),
+          )),
     );
   }
 }

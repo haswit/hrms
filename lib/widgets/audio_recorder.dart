@@ -6,6 +6,7 @@ import 'package:record/record.dart';
 class AudioRecorder extends StatefulWidget {
   final void Function(String path) onStop;
 
+  // ignore: use_key_in_widget_constructors
   const AudioRecorder({required this.onStop});
 
   @override
@@ -59,7 +60,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     late Color color;
 
     if (_isRecording || _isPaused) {
-      icon = Icon(Icons.stop, color: Colors.red, size: 30);
+      icon = const Icon(Icons.stop, color: Colors.red, size: 30);
       color = Colors.red.withOpacity(0.1);
     } else {
       final theme = Theme.of(context);
@@ -89,11 +90,11 @@ class _AudioRecorderState extends State<AudioRecorder> {
     late Color color;
 
     if (!_isPaused) {
-      icon = Icon(Icons.pause, color: Colors.red, size: 30);
+      icon = const Icon(Icons.pause, color: Colors.red, size: 30);
       color = Colors.red.withOpacity(0.1);
     } else {
       final theme = Theme.of(context);
-      icon = Icon(Icons.play_arrow, color: Colors.red, size: 30);
+      icon = const Icon(Icons.play_arrow, color: Colors.red, size: 30);
       color = theme.primaryColor.withOpacity(0.1);
     }
 
@@ -115,7 +116,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
       return _buildTimer();
     }
 
-    return Text("Waiting to record");
+    return const Text("Waiting to record");
   }
 
   Widget _buildTimer() {
@@ -124,7 +125,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
     return Text(
       '$minutes : $seconds',
-      style: TextStyle(color: Colors.red),
+      style: const TextStyle(color: Colors.red),
     );
   }
 

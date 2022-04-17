@@ -5,7 +5,7 @@ AppBar headerNav(String? title) {
     iconTheme: const IconThemeData(color: Color.fromARGB(255, 255, 255, 255)),
     title: Text(
       title ?? "HRMS",
-      style: TextStyle(
+      style: const TextStyle(
           color: Color.fromARGB(228, 255, 255, 255),
           fontSize: 25,
           fontWeight: FontWeight.bold),

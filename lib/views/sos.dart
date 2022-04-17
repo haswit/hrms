@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hrms_app/views/sos_tracking_page.dart';
 import 'package:hrms_app/widgets/drawer.dart';
 import '../widgets/appbar.dart';
-import 'camera.dart';
 
 class Sos extends StatefulWidget {
   const Sos({Key? key}) : super(key: key);

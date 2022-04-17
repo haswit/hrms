@@ -281,9 +281,9 @@ class _LoginState extends State<Login> {
                                                                   BorderPainter(),
                                                               child: Container(
                                                                 padding:
-                                                                    EdgeInsets
+                                                                    const EdgeInsets
                                                                         .all(5),
-                                                                child: Icon(
+                                                                child: const Icon(
                                                                   Icons
                                                                       .fingerprint,
                                                                   color: Colors
@@ -292,7 +292,7 @@ class _LoginState extends State<Login> {
                                                                 ),
                                                               ),
                                                             ),
-                                                            Text(
+                                                            const Text(
                                                               '',
                                                               style: TextStyle(
                                                                 fontSize: 15,
