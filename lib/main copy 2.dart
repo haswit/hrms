@@ -1,14 +1,3 @@
-// Copyright 2018 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-import 'dart:async';
-import 'dart:isolate';
-import 'dart:ui';
-
-import 'package:flutter/material.dart';
-
-import 'package:geofencing/geofencing.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hrms_app/views/home_screen.dart';
@@ -69,37 +58,20 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
-          home: MyHomePage(),
+          home: const MyHomePage(),
           builder: EasyLoading.init(),
         ));
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String geofenceState = 'N/A';
-  List<String> registeredGeofences = [];
-  double latitude = 17.39038;
-  double longitude = 78.44265;
-  double radius = 150.0;
-  ReceivePort port = ReceivePort();
-  final List<GeofenceEvent> triggers = <GeofenceEvent>[
-    GeofenceEvent.enter,
-    GeofenceEvent.dwell,
-    GeofenceEvent.exit
-  ];
-  final AndroidGeofencingSettings androidSettings = AndroidGeofencingSettings(
-      initialTrigger: <GeofenceEvent>[
-        GeofenceEvent.enter,
-        GeofenceEvent.exit,
-        GeofenceEvent.dwell
-      ],
-      loiteringDelay: 1000 * 60);
-
   bool isLoaded = false;
   bool languageSelected = false;
   bool isLoggedIn = false;
@@ -134,77 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    print("=================port ${port.sendPort}======");
-    IsolateNameServer.registerPortWithName(
-        port.sendPort, 'geofencing_send_port');
-    port.listen((dynamic data) {
-      print(
-          'Event===========================================================================: $data');
-      setState(() {
-        geofenceState = data;
-      });
-    });
-    initPlatformState();
-    registerTracking();
     getUser();
-  }
-
-  static void callback(List<String> ids, Location l, GeofenceEvent e) async {
-    print('Fences: $ids Location $l Event: $e');
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('geofencing_send_port');
-    send?.send(e.toString());
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    print('Initializing...');
-    await GeofencingManager.initialize();
-    print('Initialization done');
-  }
-
-  String? numberValidator(String value) {
-    if (value == null) {
-      return null;
-    }
-    final num? a = num.tryParse(value);
-    if (a == null) {
-      return '"$value" is not a valid number';
-    }
-    return null;
-  }
-
-  registerTracking() {
-    if (latitude == null) {
-      setState(() => latitude = 0.0);
-    }
-    if (longitude == null) {
-      setState(() => longitude = 0.0);
-    }
-    if (radius == null) {
-      setState(() => radius = 0.0);
-    }
-    GeofencingManager.registerGeofence(
-            GeofenceRegion('office1', latitude, longitude, radius, triggers,
-                androidSettings: androidSettings),
-            callback)
-        .then((_) {
-      GeofencingManager.getRegisteredGeofenceIds().then((value) {
-        setState(() {
-          registeredGeofences = value;
-        });
-      });
-    });
-  }
-
-  unRegisterTracking() {
-    GeofencingManager.removeGeofenceById('office1').then((_) {
-      GeofencingManager.getRegisteredGeofenceIds().then((value) {
-        setState(() {
-          registeredGeofences = value;
-        });
-      });
-    });
   }
 
   @override

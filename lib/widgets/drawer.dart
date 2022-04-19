@@ -4,6 +4,8 @@ import 'package:hrms_app/services/auth.dart';
 import 'package:hrms_app/views/settings_page.dart';
 import 'package:hrms_app/views/sos.dart';
 
+import '../views/login.dart';
+
 class MyDrawer extends StatelessWidget {
   const MyDrawer({Key? key}) : super(key: key);
 
@@ -27,8 +29,8 @@ class MyDrawer extends StatelessWidget {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const MyHomePage()));
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const Login()));
                 },
               ),
               ListTile(

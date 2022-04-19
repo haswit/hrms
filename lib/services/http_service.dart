@@ -136,8 +136,8 @@ class HttpService {
       if (r.statusCode == 200) {
         await EasyLoading.showSuccess("Submitted Successfully");
 
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const MyHomePage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => MyHomePage()));
       }
     });
   }
@@ -176,7 +176,6 @@ class HttpService {
   static submitAudio(context, path) async {
     const String baseUrl = "https://lghrms.live/";
 
-
     var url = baseUrl + "add-audio";
 
     MySharedPreferences.instance.getStringValue("id").then((id) async {
@@ -202,8 +201,8 @@ class HttpService {
       if (r.statusCode == 200) {
         await EasyLoading.showSuccess("Submitted Successfully");
 
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const MyHomePage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => MyHomePage()));
       } else {
         if (kDebugMode) {
           print(r.statusCode);
@@ -246,8 +245,8 @@ class HttpService {
       if (r.statusCode == 200) {
         await EasyLoading.showSuccess("Submitted Successfully");
 
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const MyHomePage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => MyHomePage()));
       }
     });
   }

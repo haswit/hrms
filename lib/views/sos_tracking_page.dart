@@ -126,8 +126,8 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
         width: MediaQuery.of(context).size.width * 0.8,
         child: CustomButton(
             onclickFunction: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const MyHomePage()));
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => MyHomePage()));
             },
             text: "Mark as Resolved"));
   }
@@ -219,7 +219,7 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
               builder: (BuildContext context) {
                 return StatefulBuilder(
                   builder: (context, state) {
-                    return Container(height: 300, child: const Text("three"));
+                    return const SizedBox(height: 300, child: Text("three"));
                   },
                 );
               });
@@ -246,7 +246,7 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
             builder: (BuildContext context) {
               return StatefulBuilder(
                 builder: (context, state) {
-                  return Container(
+                  return SizedBox(
                     height: 300,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -322,7 +322,7 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
                   builder: (context, state) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 25.0),
-                      child: Container(
+                      child: SizedBox(
                           height: MediaQuery.of(context).size.height * 1,
                           child: Column(
                             children: [
@@ -374,7 +374,7 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
             builder: (BuildContext context) {
               return StatefulBuilder(
                 builder: (context, state) {
-                  return Container(
+                  return SizedBox(
                       height: MediaQuery.of(context).size.height * 0.3,
                       child: Form(
                         child: Column(

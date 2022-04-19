@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hrms_app/services/my_shared_prederences.dart';
+import 'package:hrms_app/views/activities.dart';
 import 'package:hrms_app/views/attendance.dart';
+import 'package:hrms_app/views/notification_screen.dart';
 import 'package:hrms_app/views/settings_page.dart';
 import 'package:hrms_app/views/sos.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'home.dart';
+import 'package:hrms_app/views/submit_incedent.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -27,14 +26,14 @@ class _HomeScreenState extends State<HomeScreen> {
       subtitle: "Add IN - OUT entries",
       img: "assets/media/map.png",
       event: "",
-      onclickWidget: Attendance());
+      onclickWidget: const Attendance());
 
   Items item4 = Items(
       title: "Activity",
       subtitle: "Attendance Log",
       img: "assets/media/activities.png",
       event: "",
-      onclickWidget: const Text(""));
+      onclickWidget: Activities());
 
   Items item5 = Items(
       title: "Emergency",
@@ -55,14 +54,14 @@ class _HomeScreenState extends State<HomeScreen> {
       subtitle: "Submit an incedent",
       img: "assets/media/info.png",
       event: "",
-      onclickWidget: const Text(""));
+      onclickWidget: SubmitIncedent());
 
   Items item8 = Items(
       title: "Notifications",
       subtitle: "Check out notifications",
       img: "assets/media/notification.png",
       event: "3 notifications",
-      onclickWidget: const Text(""));
+      onclickWidget: const NotificationScreen());
 
   @override
   void initState() {
@@ -81,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 7, 68, 119),
+        backgroundColor: const Color.fromARGB(255, 34, 39, 41),
         title: const Text("Home"),
         elevation: 5,
         actions: const [

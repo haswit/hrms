@@ -1,10 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hrms_app">
    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+   <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+   <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+   
+   <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+   <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
    <application
         android:label="HRMS App"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/launcher_icon"
+        android:foregroundServiceType="location"
+        android:stopWithTask="true">
 
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyCYN6YXuCbg2bQYKcmP6So4csr8WDGNLhE"/>
@@ -30,6 +42,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <receiver android:name="io.flutter.plugins.geofencing.GeofencingBroadcastReceiver"
+            android:enabled="true" android:exported="true"/>
+        <service android:name="io.flutter.plugins.geofencing.GeofencingService"
+            android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true"/>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
