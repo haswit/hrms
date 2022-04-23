@@ -6,23 +6,32 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:hrms_app/services/request_location.dart';
 import 'package:geofencing/geofencing.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hrms_app/services/push_fcm.dart';
+import 'package:hrms_app/views/access_denied.dart';
+import 'package:hrms_app/views/gps_alert.dart';
 import 'package:hrms_app/views/home_screen.dart';
 import 'package:hrms_app/views/login.dart';
 import 'package:hrms_app/views/settings_page.dart';
+import 'package:hrms_app/widgets/messaging_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/models/profile.dart';
+import 'package:location/location.dart' as locationPakage;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  await Firebase.initializeApp();
 
   AwesomeNotifications().initialize(null, // icon for your app notification
       [
@@ -32,6 +41,7 @@ Future<void> main() async {
             channelDescription: "Notification example",
             defaultColor: const Color(0XFF9050DD),
             ledColor: Colors.white,
+            locked: true,
             playSound: true,
             enableLights: true,
             enableVibration: true)
@@ -75,6 +85,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+locationPakage.Location location = locationPakage.Location();
+
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -83,9 +95,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String geofenceState = 'N/A';
   List<String> registeredGeofences = [];
-  double latitude = 17.39038;
-  double longitude = 78.44265;
-  double radius = 150.0;
+  late double latitude;
+  late double longitude;
+  late double radius;
   ReceivePort port = ReceivePort();
   final List<GeofenceEvent> triggers = <GeofenceEvent>[
     GeofenceEvent.enter,
@@ -106,7 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      latitude = prefs.getDouble('latitude')!;
+      longitude = prefs.getDouble('longitude')!;
 
+      radius = prefs.getDouble('outerRadius')!;
+    });
     var selected = prefs.getString('_selectedLanguage');
     if (selected != "") {
       setState(() {
@@ -130,22 +147,64 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  String _notificationMsg = 'No Message';
+  _changeMsg(String msg) {
+    setState(() {
+      _notificationMsg = msg;
+      print(_notificationMsg);
+    });
+  }
+
+  checkPermissions() async {
+    bool _serviceEnabled;
+    locationPakage.PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+
+      if (!_serviceEnabled) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => GpsAlert()));
+      } else {
+        initPlatformState();
+        registerTracking();
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == locationPakage.PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != locationPakage.PermissionStatus.granted) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => GpsAlert()));
+      } else {
+        initPlatformState();
+        registerTracking();
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+
+    // FCM firebaseMessaging = FCM();
+    // firebaseMessaging.setNotifications();
+    // firebaseMessaging.streamCtlr.stream.listen((msgData) {
+    //   _changeMsg(msgData);
+    // });
 
     print("=================port ${port.sendPort}======");
     IsolateNameServer.registerPortWithName(
         port.sendPort, 'geofencing_send_port');
     port.listen((dynamic data) {
-      print(
-          'Event===========================================================================: $data');
+      print('Event====================================: $data');
       setState(() {
         geofenceState = data;
       });
     });
-    initPlatformState();
-    registerTracking();
+    checkPermissions();
     getUser();
   }
 
@@ -240,6 +299,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     ? const Settings()
                     : !isLoggedIn
                         ? const Login()
-                        : const HomeScreen()));
+                        : HomeScreen()));
   }
 }

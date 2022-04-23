@@ -164,27 +164,27 @@ class _HomeState extends State<Home> {
 
     intSharedPrefs();
 
-    final cron = Cron();
-    cron.schedule(Schedule.parse('*/1 * * * *'), () async {
-      // print('every three minutes');
-      if (kDebugMode) {
-        print("CRON EXECUTING");
-      }
-      if (!prefs.containsKey("inLoginZone")) {
-        prefs.setBool("inLoginZone", inLoginZone);
+    // final cron = Cron();
+    // cron.schedule(Schedule.parse('*/1 * * * *'), () async {
+    //   // print('every three minutes');
+    //   if (kDebugMode) {
+    //     print("CRON EXECUTING");
+    //   }
+    //   if (!prefs.containsKey("inLoginZone")) {
+    //     prefs.setBool("inLoginZone", inLoginZone);
 
-        HttpService.submitLocationTracking(inLoginZone);
-      } else {
-        if (prefs.getBool("inLoginZone") != inLoginZone) {
-          prefs.setBool("inLoginZone", inLoginZone);
-          HttpService.submitLocationTracking(inLoginZone);
-          if (!inLoginZone) {
-            createNotification("Please move into login zone",
-                "Logging out session in 3 minutes");
-          }
-        }
-      }
-    });
+    //     HttpService.submitLocationTracking(inLoginZone);
+    //   } else {
+    //     if (prefs.getBool("inLoginZone") != inLoginZone) {
+    //       prefs.setBool("inLoginZone", inLoginZone);
+    //       HttpService.submitLocationTracking(inLoginZone);
+    //       if (!inLoginZone) {
+    //         createNotification("Please move into login zone",
+    //             "Logging out session in 3 minutes");
+    //       }
+    //     }
+    //   }
+    // });
 
     var _sessionsData = HttpService().getSessions();
     _sessionsData.then((value) {
@@ -262,69 +262,11 @@ class _HomeState extends State<Home> {
     return distance < widget.innerRadius;
   }
 
-  bottomModalSheet() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(18.0),
-                  child: Text("Todays sessions"),
-                ),
-                SizedBox(
-                  height: 700,
-                  child: FutureBuilder(
-                    future: HttpService().getSessions(),
-                    builder: (context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData) {
-                        // if (snapshot.data[snapshot.data.length - 1]
-                        //         ['session'] ==
-                        //     "IN") {
-                        //   alreadyIn = true;
-                        // }
-
-                        return ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            itemCount: snapshot.data.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                decoration: const BoxDecoration(),
-                                child: ListTile(
-                                  trailing: const Icon(
-                                    Icons.photo,
-                                    color: Colors.blue,
-                                  ),
-                                  title: Text(snapshot.data[index]['session']),
-                                  subtitle:
-                                      Text(snapshot.data[index]['date_time']),
-                                  leading: Container(
-                                    margin: const EdgeInsets.only(top: 5),
-                                    decoration: BoxDecoration(
-                                        color: snapshot.data[index]
-                                                    ['session'] ==
-                                                "IN"
-                                            ? Colors.green
-                                            : Colors.red,
-                                        borderRadius:
-                                            BorderRadius.circular(50)),
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                ),
-                              );
-                            });
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    mapController.dispose();
   }
 
   @override

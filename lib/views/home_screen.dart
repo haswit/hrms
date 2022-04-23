@@ -9,6 +9,7 @@ import 'package:hrms_app/views/settings_page.dart';
 import 'package:hrms_app/views/sos.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hrms_app/views/submit_incedent.dart';
+import 'package:location/location.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -80,22 +81,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 34, 39, 41),
-        title: const Text("Home"),
-        elevation: 5,
+        backgroundColor: Color.fromARGB(238, 45, 101, 138),
+        title: const Text(
+          "Home",
+          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        ),
+        elevation: 10,
         actions: const [
           Padding(
               padding: EdgeInsets.all(15),
               child: Icon(
                 Icons.logout,
-                color: Colors.white,
+                color: Color.fromARGB(255, 255, 255, 255),
               ))
         ],
       ),
       body: user_id == ""
           ? Container(
               height: double.infinity,
-              color: const Color.fromARGB(255, 219, 192, 158),
+              color: Color.fromARGB(204, 41, 108, 139),
               child: Center(
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -137,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: SizedBox(
                   child: Container(
                     height: MediaQuery.of(context).size.height,
-                    color: const Color.fromARGB(255, 219, 192, 158),
+                    color: Color.fromARGB(204, 41, 108, 139),
                     child: Column(
                       children: [
                         const SizedBox(
@@ -155,7 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.only(
                                 left: 5, top: 5, right: 5),
                             child: Text(
-                              user_id,
+                              // user_id,
+                              "username",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 25),
                             ),
@@ -171,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: double.infinity,
                           height: MediaQuery.of(context).size.height * 0.8,
                           decoration: const BoxDecoration(
-                            color: Color.fromARGB(200, 131, 153, 168),
+                            color: Color.fromARGB(238, 45, 101, 138),
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(40),
                               topRight: Radius.circular(40),
@@ -184,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 childAspectRatio: 1.0,
                                 padding:
                                     const EdgeInsets.only(left: 16, right: 16),
-                                crossAxisCount: 3,
+                                crossAxisCount: 2,
                                 crossAxisSpacing: 18,
                                 mainAxisSpacing: 18,
                                 children: myList.map((data) {
@@ -192,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     position: myList.indexOf(data),
                                     duration:
                                         const Duration(milliseconds: 1500),
-                                    columnCount: 3,
+                                    columnCount: 2,
                                     child: ScaleAnimation(
                                       child: FadeInAnimation(
                                         child: GestureDetector(
@@ -207,6 +212,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             elevation: 4,
                                             child: Container(
                                               decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(300)),
                                                 color: Color.fromARGB(
                                                     38, 189, 187, 187),
                                               ),
@@ -216,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 children: <Widget>[
                                                   Image.asset(
                                                     data.img,
-                                                    width: 42,
+                                                    width: 55,
                                                   ),
                                                   const SizedBox(
                                                     height: 14,
