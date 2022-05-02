@@ -1,9 +1,7 @@
-import 'package:cron/cron.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/views/gps_alert.dart';
 import 'package:hrms_app/views/home_screen.dart';
-import 'package:hrms_app/views/notifications.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as tk;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -163,28 +161,6 @@ class _HomeState extends State<Home> {
     super.initState();
 
     intSharedPrefs();
-
-    // final cron = Cron();
-    // cron.schedule(Schedule.parse('*/1 * * * *'), () async {
-    //   // print('every three minutes');
-    //   if (kDebugMode) {
-    //     print("CRON EXECUTING");
-    //   }
-    //   if (!prefs.containsKey("inLoginZone")) {
-    //     prefs.setBool("inLoginZone", inLoginZone);
-
-    //     HttpService.submitLocationTracking(inLoginZone);
-    //   } else {
-    //     if (prefs.getBool("inLoginZone") != inLoginZone) {
-    //       prefs.setBool("inLoginZone", inLoginZone);
-    //       HttpService.submitLocationTracking(inLoginZone);
-    //       if (!inLoginZone) {
-    //         createNotification("Please move into login zone",
-    //             "Logging out session in 3 minutes");
-    //       }
-    //     }
-    //   }
-    // });
 
     var _sessionsData = HttpService().getSessions();
     _sessionsData.then((value) {
@@ -571,9 +547,9 @@ class CustomInnerContent extends StatelessWidget {
         SizedBox(height: 12),
         CustomDraggingHandle(),
         SizedBox(height: 16),
-        MySitesTitle(),
-        SizedBox(height: 16),
-        MySites(),
+        // MySitesTitle(),
+        // SizedBox(height: 16),
+        // MySites(),
         SizedBox(height: 24),
         SessionList(),
         SizedBox(height: 16),

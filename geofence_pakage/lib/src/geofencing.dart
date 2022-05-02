@@ -34,7 +34,6 @@ int geofenceEventToInt(GeofenceEvent e) {
   }
 }
 
-// TODO(bkonyi): handle event masks
 // Internal.
 GeofenceEvent intToGeofenceEvent(int e) {
   switch (e) {

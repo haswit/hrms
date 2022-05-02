@@ -8,7 +8,7 @@ import 'package:hrms_app/views/notification_screen.dart';
 import 'package:hrms_app/views/settings_page.dart';
 import 'package:hrms_app/views/sos.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:hrms_app/views/submit_incedent.dart';
+import 'package:hrms_app/views/incedent_responce.dart';
 import 'package:location/location.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
       subtitle: "Attendance Log",
       img: "assets/media/activities.png",
       event: "",
-      onclickWidget: Activities());
+      onclickWidget: const Activities());
 
   Items item5 = Items(
       title: "Emergency",
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
       subtitle: "Submit an incedent",
       img: "assets/media/info.png",
       event: "",
-      onclickWidget: SubmitIncedent());
+      onclickWidget: const SubmitIncedent());
 
   Items item8 = Items(
       title: "Notifications",
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(238, 45, 101, 138),
+        backgroundColor: const Color.fromARGB(238, 45, 101, 138),
         title: const Text(
           "Home",
           style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: user_id == ""
           ? Container(
               height: double.infinity,
-              color: Color.fromARGB(204, 41, 108, 139),
+              color: const Color.fromARGB(204, 41, 108, 139),
               child: Center(
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: SizedBox(
                   child: Container(
                     height: MediaQuery.of(context).size.height,
-                    color: Color.fromARGB(204, 41, 108, 139),
+                    color: const Color.fromARGB(204, 41, 108, 139),
                     child: Column(
                       children: [
                         const SizedBox(
@@ -158,10 +158,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           subtitle: Padding(
                             padding: const EdgeInsets.only(
                                 left: 5, top: 5, right: 5),
-                            child: Text(
+                            child: const Text(
                               // user_id,
                               "username",
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: Colors.white, fontSize: 25),
                             ),
                           ),

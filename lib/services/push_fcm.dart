@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -21,16 +23,16 @@ class FCM {
     // Or do other work.
   }
 
-
-
   Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    print('_firebaseMessagingBackgroundHandler');
+    print(
+        '---------------------------------------background---------------------------');
 
     Future onDidReceiveLocalNotification(
         int? id, String? title, String? body, String? payload) async {
       print(title);
-      print('onDidReceiveLocalNotification');
+      print(
+          '---------------------------------------------notification----------------------');
     }
 
     ///Not able to stop default notification
@@ -48,6 +50,7 @@ class FCM {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       // showNotification(notification);
+      print("------------------------------line 49---------------");
       print(notification);
     });
 

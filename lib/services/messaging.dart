@@ -30,14 +30,14 @@ class Messaging {
       client.post(
         Uri.parse('https://fcm.googleapis.com/fcm/send'),
         body: json.encode({
-          'notification': {'body': '$body', 'title': '$title'},
+          'notification': {'body': body, 'title': title},
           'priority': 'high',
           'data': {
             'click_action': 'FLUTTER_NOTIFICATION_CLICK',
             'id': '1',
             'status': 'done',
           },
-          'to': '$fcmToken',
+          'to': fcmToken,
         }),
         headers: {
           'Content-Type': 'application/json',

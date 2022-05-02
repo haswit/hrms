@@ -2,30 +2,32 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:cron/cron.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hrms_app/services/request_location.dart';
 import 'package:geofencing/geofencing.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:hrms_app/services/push_fcm.dart';
-import 'package:hrms_app/views/access_denied.dart';
+import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/views/gps_alert.dart';
 import 'package:hrms_app/views/home_screen.dart';
 import 'package:hrms_app/views/login.dart';
+import 'package:hrms_app/views/notifications.dart';
 import 'package:hrms_app/views/settings_page.dart';
-import 'package:hrms_app/widgets/messaging_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/models/profile.dart';
 import 'package:location/location.dart' as locationPakage;
+import 'package:maps_toolkit/maps_toolkit.dart' as tk;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -116,14 +118,52 @@ class _MyHomePageState extends State<MyHomePage> {
   bool languageSelected = false;
   bool isLoggedIn = false;
 
+  late bool inLoginZone;
+
+  bool userInRarius(l) {
+    final distance = tk.SphericalUtil.computeDistanceBetween(
+        tk.LatLng(latitude, longitude), l);
+    return distance < radius;
+  }
+
+  cronJob() async {
+    print('executing...');
+    late final SharedPreferences prefs;
+    prefs = await SharedPreferences.getInstance();
+    location.getLocation().then((value) {
+      bool x = userInRarius(
+          tk.LatLng(value.latitude!.toDouble(), value.longitude!.toDouble()));
+      if (x) {
+        print("User in Radius");
+        setState(() {
+          inLoginZone = true;
+        });
+      } else {
+        print("User not in Radius");
+        //NotifyUser("Please move into Login zone to enter the attendance");
+        setState(() {
+          inLoginZone = false;
+        });
+      }
+
+      HttpService.submitLocationTracking(inLoginZone);
+    });
+  }
+
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      latitude = prefs.getDouble('latitude')!;
-      longitude = prefs.getDouble('longitude')!;
+    try {
+      setState(() {
+        latitude = prefs.getDouble('latitude')!;
+        longitude = prefs.getDouble('longitude')!;
 
-      radius = prefs.getDouble('outerRadius')!;
+        radius = prefs.getDouble('outerRadius')!;
+      });
+    } catch (e) {}
+    setState(() {
+      isLoaded = true;
     });
+
     var selected = prefs.getString('_selectedLanguage');
     if (selected != "") {
       setState(() {
@@ -142,8 +182,13 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
 
-    setState(() {
-      isLoaded = true;
+    final cron = Cron();
+    cron.schedule(Schedule.parse('*/1 * * * *'), () async {
+      // print('every three minutes');
+      if (kDebugMode) {
+        print("CRON EXECUTING");
+      }
+      cronJob();
     });
   }
 
@@ -269,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return !isLoaded
-        ? Center(child: Image.asset("assets/media/logo-main.png"))
+        ? const Center(child: const CircularProgressIndicator())
         : SafeArea(
             child: WillPopScope(
                 onWillPop: () async {
@@ -299,6 +344,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     ? const Settings()
                     : !isLoggedIn
                         ? const Login()
-                        : HomeScreen()));
+                        : const HomeScreen()));
   }
 }

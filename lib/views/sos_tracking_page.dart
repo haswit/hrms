@@ -9,10 +9,12 @@ import 'package:hrms_app/widgets/custom_button.dart';
 import 'package:hrms_app/widgets/drawer.dart';
 import 'package:hrms_app/widgets/timeline.dart';
 import 'package:just_audio/just_audio.dart' as ap;
+import 'package:audioplayers/audioplayers.dart' as Aps;
 
 class SosTrackingPage extends StatefulWidget {
   var cameras;
-  SosTrackingPage({Key? key, this.cameras}) : super(key: key);
+  var sosid;
+  SosTrackingPage({Key? key, this.cameras, this.sosid}) : super(key: key);
 
   @override
   _SosTrackingPageState createState() => _SosTrackingPageState();
@@ -20,6 +22,7 @@ class SosTrackingPage extends StatefulWidget {
 
 class _SosTrackingPageState extends State<SosTrackingPage> {
   bool showPlayer = false;
+
   ap.AudioSource? audioSource;
   late CameraController controller;
   XFile? pictureFile;
@@ -28,6 +31,7 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
   var filepath;
   // ignore: prefer_typing_uninitialized_variables
   var path;
+  playAudio() async {}
 
   late List<Widget> timelineItems = [];
   late List<Widget> indicatorIcons = [];
@@ -51,41 +55,12 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
   }
 
   // ignore: non_constant_identifier_names
-  var sos_data = [
-    {"id": 1, "type": "message", "content": "Hi", "date_time": "20-11-2022"},
-    {
-      "id": 1,
-      "type": "message",
-      "content": "I need",
-      "date_time": "20-11-2022"
-    },
-    {"id": 1, "type": "message", "content": "help", "date_time": "20-11-2022"}
-  ];
+  var sos_data = [];
 
   @override
   void initState() {
     super.initState();
     showPlayer = false;
-    List<Widget> temptimelineItems = [];
-    List<Widget> tempindicatorIcons = [];
-
-// Icon(Icons.access_alarm),
-// Icon(Icons.accessibility_new),
-// Icon(Icons.chat),
-// Icon(Icons.photo),
-// Icon(Icons.mic),
-
-    for (var item in sos_data) {
-      if (item['type'] == "message") {
-        tempindicatorIcons.add(const Icon(Icons.photo));
-        temptimelineItems.add(messageWidget(item['content'].toString()));
-      }
-    }
-
-    setState(() {
-      timelineItems = temptimelineItems;
-      indicatorIcons = tempindicatorIcons;
-    });
 
     controller = CameraController(
       widget.cameras![0],
@@ -95,6 +70,39 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
       if (!mounted) {
         return;
       }
+    });
+
+    HttpService().getSosData(widget.sosid!).then((value) {
+      setState(() {
+        sos_data = value;
+        print("value received------------------");
+        print(value);
+        List<Widget> temptimelineItems = [];
+        List<Widget> tempindicatorIcons = [];
+
+// Icon(Icons.access_alarm),
+// Icon(Icons.accessibility_new),
+// Icon(Icons.chat),
+// Icon(Icons.photo),
+// Icon(Icons.mic),
+
+        for (var item in sos_data) {
+          if (item['file_type'] == "message") {
+            tempindicatorIcons.add(const Icon(Icons.photo));
+            temptimelineItems.add(messageWidget(item['content'].toString()));
+          } else if (item['file_type'] == "audio") {
+            print(item['content'].split("/")[1]);
+            tempindicatorIcons.add(const Icon(Icons.audio_file));
+            temptimelineItems
+                .add(voiceMessageWidget(item['content'].split("/")[1]));
+          }
+        }
+
+        setState(() {
+          timelineItems = temptimelineItems;
+          indicatorIcons = tempindicatorIcons;
+        });
+      });
     });
   }
 
@@ -161,53 +169,52 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
     );
   }
 
-  Container emergencyHeader() {
-    return Container(
-      padding: const EdgeInsets.all(40),
-      width: double.infinity,
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: const [
-            Text(
-              "Emergency",
-              style: TextStyle(
-                  color: Color.fromARGB(230, 255, 255, 255),
-                  fontSize: 30,
-                  fontFamily: 'Calistoga'),
-            ),
-            Text("Request sent!",
+  SingleChildScrollView emergencyHeader() {
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(40),
+        width: double.infinity,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                "Emergency",
                 style: TextStyle(
-                    color: Color.fromARGB(211, 255, 255, 255),
+                    color: Color.fromARGB(230, 255, 255, 255),
                     fontSize: 30,
-                    fontFamily: 'Calistoga')),
-            SizedBox(
-              height: 10,
-            ),
-            Text("Please stay calm!",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                )),
-            SizedBox(
-              height: 10,
-            ),
-            Text("Help will reachout to you soon",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                )),
-          ]),
-      height: 220,
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(
-        begin: Alignment.topRight,
-        end: Alignment.bottomLeft,
-        colors: [
-          Color.fromARGB(242, 248, 104, 37),
-          Color.fromARGB(255, 248, 71, 59),
-        ],
-      )),
+                    fontFamily: 'Calistoga'),
+              ),
+              Text("Request sent!",
+                  style: TextStyle(
+                      color: Color.fromARGB(211, 255, 255, 255),
+                      fontSize: 30,
+                      fontFamily: 'Calistoga')),
+              SizedBox(
+                height: 10,
+              ),
+              Text("Please stay calm!",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  )),
+              Text("Help will reachout to you soon",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  )),
+            ]),
+        height: 220,
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color.fromARGB(242, 248, 104, 37),
+            Color.fromARGB(255, 248, 71, 59),
+          ],
+        )),
+      ),
     );
   }
 
@@ -283,8 +290,8 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
                             child: showPlayer
                                 ? ElevatedButton(
                                     onPressed: () {
-                                      HttpService.submitAudio(
-                                          context, filepath);
+                                      HttpService.submitAudio(context, filepath,
+                                          widget.sosid.toString());
                                     },
                                     child: const Text("Send"))
                                 : null)
@@ -380,7 +387,7 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
                         child: Column(
                           children: [
                             const Center(
-                                child: const Text("one",
+                                child: const Text("Enter Message",
                                     style: TextStyle(
                                         fontSize: 25,
                                         fontFamily: 'Calistoga'))),
@@ -388,7 +395,9 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
                               onChanged: (value) {
                                 updateMessageState(state, value);
                               },
-                            )
+                            ),
+                            ElevatedButton(
+                                onPressed: () {}, child: Text("Send")),
                           ],
                         ),
                       ));
@@ -411,19 +420,25 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
     );
   }
 
-  ListTile voiceMessageWidget() {
+  ListTile voiceMessageWidget(path) {
+    var audioPlayer = Aps.AudioPlayer();
+
+    // source: ap.AudioSource.uri(
+    //   Uri.parse(
+    //       "https://lghrms.live/get-file/id_2075837a-bb63-11ec-9c8c-35822c0ae48e.m4a"),
+    // ));
     return ListTile(
-      subtitle: const Text("12:45 PM"),
+      onTap: () {
+        audioPlayer.play(
+            "https://lghrms.live/get-file/id_2075837a-bb63-11ec-9c8c-35822c0ae48e.m4a");
+      },
+      subtitle: const Text("12:42 PM"),
       title: Container(
+        alignment: Alignment.bottomLeft,
         color: Colors.transparent,
-        child: const ListTile(
-          leading: Icon(
-            Icons.mic,
-            color: Colors.black,
-          ),
-          trailing: Icon(Icons.play_arrow_rounded),
-          subtitle: Text("0:15 min"),
-          title: Text("Voice message sent"),
+        child: const Icon(
+          Icons.audio_file,
+          size: 30,
         ),
       ),
     );

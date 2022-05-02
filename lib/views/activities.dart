@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/widgets/appbar.dart';
 import 'package:hrms_app/widgets/timeline.dart';
 
@@ -28,42 +29,43 @@ class _ActivitiesState extends State<Activities> {
 // Icon(Icons.chat),
 // Icon(Icons.photo),
 // Icon(Icons.mic),
-    var sos_data = [
-      {"id": 1, "session": "OUT", "date_time": "20-11-2022", "site": "Site A"},
-      {"id": 1, "session": "IN", "date_time": "20-11-2022", "site": "Site A"},
-    ];
 
-    for (var item in sos_data) {
-      if (item['session'] == "IN") {
-        tempindicatorIcons.add(InIcon());
-        temptimelineItems.add(InCard(item));
-      } else {
-        tempindicatorIcons.add(OutIcon());
-        temptimelineItems.add(OutCard(item));
+    HttpService().getAllSessions().then((value) {
+      var sosData = value;
+
+      print(sosData);
+
+      for (var item in sosData) {
+        if (item['session'] == "IN") {
+          tempindicatorIcons.add(InIcon());
+          temptimelineItems.add(InCard(item));
+        } else {
+          tempindicatorIcons.add(OutIcon());
+          temptimelineItems.add(OutCard(item));
+        }
       }
-    }
-
-    setState(() {
-      timelineItems = temptimelineItems;
-      indicatorIcons = tempindicatorIcons;
+      setState(() {
+        timelineItems = temptimelineItems;
+        indicatorIcons = tempindicatorIcons;
+      });
     });
   }
 
   SizedBox OutIcon() {
-    return SizedBox(
+    return const SizedBox(
         width: 20,
         height: 20,
-        child: Icon(
+        child: const Icon(
           Icons.logout_rounded,
           color: Colors.red,
         ));
   }
 
   SizedBox InIcon() {
-    return SizedBox(
+    return const SizedBox(
         width: 20,
         height: 20,
-        child: Icon(
+        child: const Icon(
           Icons.login_rounded,
           color: Colors.green,
         ));
@@ -73,7 +75,7 @@ class _ActivitiesState extends State<Activities> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text(item['date_time'].toString()),
+        Text(item['date_time'].toString().split(" ")[0]),
         SizedBox(
           width: 250,
           height: 80,
@@ -89,10 +91,10 @@ class _ActivitiesState extends State<Activities> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Lodded in at ${item['site']}",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        "Lodded in",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text("12:40 PM")
+                      const Text("12:40 PM")
                     ],
                   ),
                   Container(
@@ -100,8 +102,8 @@ class _ActivitiesState extends State<Activities> {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.green,
                     ),
-                    padding: EdgeInsets.all(12),
-                    child: SizedBox(
+                    padding: const EdgeInsets.all(12),
+                    child: const SizedBox(
                       height: 15,
                       width: 30,
                       child: Center(
@@ -125,7 +127,7 @@ class _ActivitiesState extends State<Activities> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        Text(item['date_time'].toString()),
+        Text(item['date_time'].toString().split(" ")[0]),
         SizedBox(
           width: 250,
           height: 80,
@@ -141,10 +143,10 @@ class _ActivitiesState extends State<Activities> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Lodded out from ${item['site']}",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        "Lodded out",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text("12:40 PM")
+                      const Text("12:40 PM")
                     ],
                   ),
                   Container(
@@ -152,12 +154,12 @@ class _ActivitiesState extends State<Activities> {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.red,
                     ),
-                    padding: EdgeInsets.all(12),
-                    child: SizedBox(
+                    padding: const EdgeInsets.all(12),
+                    child: const SizedBox(
                       width: 30,
                       height: 15,
                       child: Center(
-                        child: Text(
+                        child: const Text(
                           "OUT",
                           style: TextStyle(color: Colors.white),
                         ),
@@ -179,7 +181,7 @@ class _ActivitiesState extends State<Activities> {
       child: Scaffold(
         appBar: headerNav("Activities"),
         body: Container(
-          padding: EdgeInsets.all(15),
+          padding: const EdgeInsets.all(15),
           child: Timeline(
             children: timelineItems,
             indicators: indicatorIcons,
