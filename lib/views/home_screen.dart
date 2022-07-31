@@ -148,24 +148,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 40,
                         ),
                         ListTile(
-                          title: const Text(
-                            "Welcome Back",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontFamily: 'Calistoga'),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 5, top: 5, right: 5),
-                            child: const Text(
-                              // user_id,
-                              "username",
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 25),
-                            ),
-                          ),
-                        ),
+                            title: const Text(
+                          "Welcome Back",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontFamily: 'Calistoga'),
+                        )),
                         const SizedBox(
                           height: 30,
                         ),

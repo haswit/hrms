@@ -17,40 +17,64 @@ import 'package:http_parser/http_parser.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../views/login.dart';
+
 class HttpService {
   static final _client = http.Client();
 
-  static final _loginUrl = Uri.parse('http://lghrms.live/login');
+  // static final _loginUrl = Uri.parse('http://20.68.125.92/ErpMob/api/Login');
+  //  request.headers.set('Content-type', 'application/json');
 
   static login(cin, id, password, context) async {
-    http.Response response = await _client.post(_loginUrl, body: {
-      "cin": cin,
-      "id": id,
-      "password": password,
-    });
-    if (response.statusCode == 200) {
-      var json = jsonDecode(response.body);
+    final _loginUrl = Uri.parse('http://20.68.125.92/ErpMob/api/Login');
 
-      if (json["status"] == 'success') {
+    final headers = {'Content-Type': 'application/json'};
+    Map<String, dynamic> body = {
+      "cinNumber": cin,
+      "userName": id,
+      "password": password,
+    };
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
+
+    http.Response response = await http.post(
+      _loginUrl,
+      headers: headers,
+      body: jsonBody,
+      encoding: encoding,
+    );
+    print("$cin, $id, $password");
+    // http.Response response = await _client.post(_loginUrl,
+    //     headers: {"Content-type": "application/json"},
+    //     body: jsonEncode(<String, dynamic>{
+    //       "cinNumber": cin,
+    //       "userName": id,
+    //       "password": password,
+    //     }.toString()));
+    var jsondata = jsonDecode(response.body);
+    print(jsondata);
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      print(json);
+      if (jsondata["status"] != false) {
         await EasyLoading.showSuccess("Logged In successfuly");
-        var user = json['user'];
+        // var user = json['user'];
 
         MySharedPreferences.instance.setStringValue("logged_in", "true");
         MySharedPreferences.instance
-            .setStringValue("cin", user['cin'].toString());
+            .setStringValue("cin", jsondata['cinNumber'].toString());
+        MySharedPreferences.instance.setStringValue("token", jsondata['token']);
 
         MySharedPreferences.instance.setStringValue("id", id);
 
         MySharedPreferences.instance
-            .setDoubleValue("latitude", user['latitude']);
+            .setDoubleValue("latitude", jsondata['siteGeoLatitude']);
         MySharedPreferences.instance
-            .setDoubleValue("longitude", user['longitude']);
-        MySharedPreferences.instance.setDoubleValue("gain", user['gain']);
+            .setDoubleValue("longitude", jsondata['siteGeoLongitude']);
         MySharedPreferences.instance
-            .setDoubleValue("innerRadius", user['inner_radius']);
-        MySharedPreferences.instance
-            .setDoubleValue("outerRadius", user['outer_radius']);
-        MySharedPreferences.instance.setStringValue("id", user['id']);
+            .setDoubleValue("gain", jsondata['siteGeoGain']);
+        MySharedPreferences.instance.setDoubleValue("innerRadius", 200.0);
+        MySharedPreferences.instance.setDoubleValue("outerRadius", 400.0);
 
         // final Profile profile = Provider.of<Profile>(context, listen: false);
         // profile.cin = user['cin'];
@@ -62,24 +86,26 @@ class HttpService {
         // profile.gain = user['gain'];
         // print(profile.innerRadius);
 
-        if (user['subscribed'] == false) {
-          await Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AccessDenied()));
-        } else {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Home(
-                      latitude: user['latitude'],
-                      longitude: user['longitude'],
-                      gain: user['gain'],
-                      innerRadius: user['inner_radius'],
-                      outerRadius: user['outer_radius'],
-                    )),
-          );
-        }
+        // if (user['subscribed'] == false) {
+
+        // if (false == false) {
+        //   await Navigator.push(context,
+        //       MaterialPageRoute(builder: (context) => const AccessDenied()));
+        // } else {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Home(
+                    latitude: jsondata['siteGeoLatitude'],
+                    longitude: jsondata['siteGeoLongitude'],
+                    gain: jsondata['siteGeoGain'],
+                    innerRadius: 200,
+                    outerRadius: 400,
+                  )),
+        );
+        // }
       } else {
-        EasyLoading.showError(json["status"]);
+        EasyLoading.showError(jsondata["status"]);
       }
     } else {
       //print("${response.statusCode.toString()}");
@@ -218,21 +244,77 @@ class HttpService {
     });
   }
 
+  static logout(context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = await prefs.getString("token").toString();
+
+    String cin = await prefs.getString("cin").toString();
+
+    final url = Uri.parse('http://20.68.125.92/ErpMob/api/Logout');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    Map<String, dynamic> body = {"cinNumber": cin};
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
+    try {
+      http.Response response = await http.post(
+        url,
+        headers: headers,
+        body: jsonBody,
+        encoding: encoding,
+      );
+
+      if (response.statusCode == 200) {
+        MySharedPreferences.instance.setStringValue("logged_in", "");
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Login()),
+        );
+      }
+
+      print(response.statusCode);
+      print(response.body);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   static submitLocationTracking(status) async {
     if (kDebugMode) {
       print("SUBMITTING NEW SESSION $status");
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? id = prefs.getString("id");
+    String token = await prefs.getString("token").toString();
 
+    final url = Uri.parse('http://20.68.125.92/ErpMob/api/CheckGeoLocation');
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    Map<String, dynamic> body = {
+      "siteGeoLatitude": 1.10,
+      "siteGeoLongitude": 1.10,
+      "siteGeoGain": 1.10
+    };
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
     try {
-      http.Response response = await _client
-          .post(Uri.parse('http://lghrms.live/add-geofence-log'), body: {
-        "id": id,
-        "date_time": getDateTime(),
-        "status": status.toString()
-      });
+      http.Response response = await http.post(
+        url,
+        headers: headers,
+        body: jsonBody,
+        encoding: encoding,
+      );
+
+      print(response.statusCode);
+      print(response.body);
+
       if (response.statusCode == 200) {}
     } catch (e) {
       if (kDebugMode) {
@@ -366,8 +448,8 @@ class HttpService {
       request.fields.addAll({
         "id": id,
         "sos_id": sosid,
-        "_type": "_type",
-        "date_time": "date + " " + time",
+        "_type": "audio",
+        "date_time": getDateTime()
       });
 
       request.files.add(
@@ -377,6 +459,40 @@ class HttpService {
           contentType: MediaType('application', 'mp3'),
         ),
       );
+      http.StreamedResponse r = await request.send();
+
+      if (r.statusCode == 200) {
+        await EasyLoading.showSuccess("Submitted Successfully");
+
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => MyHomePage()));
+      } else {
+        if (kDebugMode) {
+          print(r.statusCode);
+          print(r.toString());
+          print("Something went wrong");
+        }
+      }
+    });
+  }
+
+  static submitMessage(context, message, sosid) async {
+    const String baseUrl = "https://lghrms.live/";
+
+    var url = baseUrl + "add-message";
+
+    MySharedPreferences.instance.getStringValue("id").then((id) async {
+      http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse(url));
+
+      request.fields.addAll({
+        "id": id,
+        "sos_id": sosid,
+        "_type": "message",
+        "message": message,
+        "date_time": getDateTime(),
+      });
+
       http.StreamedResponse r = await request.send();
 
       if (r.statusCode == 200) {

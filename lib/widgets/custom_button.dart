@@ -21,14 +21,9 @@ class CustomButton extends StatelessWidget {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
         padding: const EdgeInsets.all(0.0),
         child: Ink(
-          decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xff374ABE), Color(0xff64B6FF)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: BorderRadius.circular(10.7)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.7)),
           child: Container(
+            color: Colors.blue,
             width: MediaQuery.of(context).size.width,
             constraints: const BoxConstraints(minHeight: 50.0),
             alignment: Alignment.center,

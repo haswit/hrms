@@ -22,6 +22,7 @@ class SosTrackingPage extends StatefulWidget {
 
 class _SosTrackingPageState extends State<SosTrackingPage> {
   bool showPlayer = false;
+  var audio = Aps.AudioPlayer();
 
   ap.AudioSource? audioSource;
   late CameraController controller;
@@ -56,6 +57,7 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
 
   // ignore: non_constant_identifier_names
   var sos_data = [];
+  bool playing = false;
 
   @override
   void initState() {
@@ -93,8 +95,28 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
           } else if (item['file_type'] == "audio") {
             print(item['content'].split("/")[1]);
             tempindicatorIcons.add(const Icon(Icons.audio_file));
-            temptimelineItems
-                .add(voiceMessageWidget(item['content'].split("/")[1]));
+            temptimelineItems.add(
+              Container(
+                child: ListTile(
+                  subtitle: Text(item['date_time'].toString()),
+                  trailing: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(50)),
+                      child: IconButton(
+                          onPressed: () {
+                            audio.play(
+                                'https://lghrms.live/get-file/${item['content'].split("/")[1]}');
+
+                            audio.onPlayerCompletion.listen((event) {});
+                          },
+                          icon: Icon(Icons.multitrack_audio_sharp,
+                              color: Colors.white))),
+                  title: Text("Voice message sent"),
+                ),
+              ),
+            );
+            // voiceMessageWidget(item['content'].split("/")[1])));
           }
         }
 
@@ -378,29 +400,61 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
       onTap: () {
         showModalBottomSheet<void>(
             context: context,
+            isScrollControlled: true,
             builder: (BuildContext context) {
               return StatefulBuilder(
                 builder: (context, state) {
-                  return SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: Form(
-                        child: Column(
-                          children: [
-                            const Center(
-                                child: const Text("Enter Message",
-                                    style: TextStyle(
-                                        fontSize: 25,
-                                        fontFamily: 'Calistoga'))),
-                            TextFormField(
-                              onChanged: (value) {
-                                updateMessageState(state, value);
-                              },
+                  return Padding(
+                    padding: MediaQuery.of(context).viewInsets,
+                    child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        child: Form(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                          .viewInsets
+                                          .bottom),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: TextFormField(
+                                      autofocus: true,
+                                      decoration: new InputDecoration(
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.blue, width: 1.0),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Color.fromARGB(
+                                                  255, 32, 31, 31),
+                                              width: 1.0),
+                                        ),
+                                        hintText: 'Enter Message',
+                                      ),
+                                      onChanged: (value) {
+                                        updateMessageState(state, value);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                CustomButton(
+                                    onclickFunction: () {
+                                      HttpService.submitMessage(
+                                          context, _message, widget.sosid);
+                                    },
+                                    text: "Send"),
+                              ],
                             ),
-                            ElevatedButton(
-                                onPressed: () {}, child: Text("Send")),
-                          ],
-                        ),
-                      ));
+                          ),
+                        )),
+                  );
                 },
               );
             });
@@ -420,29 +474,13 @@ class _SosTrackingPageState extends State<SosTrackingPage> {
     );
   }
 
-  ListTile voiceMessageWidget(path) {
-    var audioPlayer = Aps.AudioPlayer();
-
-    // source: ap.AudioSource.uri(
-    //   Uri.parse(
-    //       "https://lghrms.live/get-file/id_2075837a-bb63-11ec-9c8c-35822c0ae48e.m4a"),
-    // ));
-    return ListTile(
-      onTap: () {
-        audioPlayer.play(
-            "https://lghrms.live/get-file/id_2075837a-bb63-11ec-9c8c-35822c0ae48e.m4a");
-      },
-      subtitle: const Text("12:42 PM"),
-      title: Container(
-        alignment: Alignment.bottomLeft,
-        color: Colors.transparent,
-        child: const Icon(
-          Icons.audio_file,
-          size: 30,
-        ),
-      ),
-    );
-  }
+  // ListTile voiceMessageWidget(path) {
+  //   // source: ap.AudioSource.uri(
+  //   //   Uri.parse(
+  //   //       "https://lghrms.live/get-file/id_2075837a-bb63-11ec-9c8c-35822c0ae48e.m4a"),
+  //   // ));
+  //   return
+  // }
 
   ListTile photoWidget() {
     return ListTile(

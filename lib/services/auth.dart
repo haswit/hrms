@@ -45,14 +45,10 @@ class AuthService {
   }
 
   logout(context) {
-    MySharedPreferences.instance.setStringValue("logged_in", "");
+    HttpService.logout(context);
 
     final Profile profile = Provider.of<Profile>(context, listen: false);
     profile.loggedin = false;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const Login()),
-    );
   }
 
   bioAuth(context) async {

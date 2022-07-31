@@ -229,15 +229,18 @@ class _LoginState extends State<Login> {
                                                             0.8,
                                                     child: CustomButton(
                                                         text: "Continue",
-                                                        onclickFunction: () =>
-                                                            authProvider.authUser(
-                                                                _cinController
-                                                                    .text,
-                                                                _idController
-                                                                    .text,
-                                                                _passwordController
-                                                                    .text,
-                                                                context)),
+                                                        onclickFunction: () {
+                                                          print(
+                                                              "=================CLICKED=========================");
+                                                          authProvider.authUser(
+                                                              _cinController
+                                                                  .text,
+                                                              _idController
+                                                                  .text,
+                                                              _passwordController
+                                                                  .text,
+                                                              context);
+                                                        }),
                                                   ),
 
                                                   const SizedBox(height: 50),
@@ -283,7 +286,8 @@ class _LoginState extends State<Login> {
                                                                 padding:
                                                                     const EdgeInsets
                                                                         .all(5),
-                                                                child: const Icon(
+                                                                child:
+                                                                    const Icon(
                                                                   Icons
                                                                       .fingerprint,
                                                                   color: Colors
