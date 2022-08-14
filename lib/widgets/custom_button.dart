@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:hrms_app/constants.dart';
 
 class CustomButton extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
@@ -23,7 +24,9 @@ class CustomButton extends StatelessWidget {
         child: Ink(
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.7)),
           child: Container(
-            color: Colors.blue,
+            decoration: BoxDecoration(
+                color: ConstantStrings.kPrimaryColor,
+                borderRadius: BorderRadius.circular(10)),
             width: MediaQuery.of(context).size.width,
             constraints: const BoxConstraints(minHeight: 50.0),
             alignment: Alignment.center,

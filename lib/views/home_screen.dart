@@ -1,15 +1,19 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hrms_app/constants.dart';
+import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/services/my_shared_prederences.dart';
 import 'package:hrms_app/views/activities.dart';
 import 'package:hrms_app/views/attendance.dart';
 import 'package:hrms_app/views/notification_screen.dart';
 import 'package:hrms_app/views/settings_page.dart';
-import 'package:hrms_app/views/sos.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:hrms_app/views/incedent_responce.dart';
+import 'package:hrms_app/views/utils.dart';
 import 'package:location/location.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,6 +24,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var user_id = "";
+  int pageIndex = 0;
+  final _pageController = PageController(initialPage: 0, keepPage: true);
+
+  final pages = [
+    LandingScreen(),
+    const SubmitIncedent(),
+    const NotificationScreen(),
+    const Settings(),
+  ];
+
+  final titles = ["Home", "Incident Report", "Notifications", "Settings"];
 
   // ignore: unnecessary_new
   Items item3 = new Items(
@@ -28,20 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
       img: "assets/media/map.png",
       event: "",
       onclickWidget: const Attendance());
-
-  Items item4 = Items(
-      title: "Activity",
-      subtitle: "Attendance Log",
-      img: "assets/media/activities.png",
-      event: "",
-      onclickWidget: const Activities());
-
-  Items item5 = Items(
-      title: "Emergency",
-      subtitle: "Reach out for help",
-      img: "assets/media/sos.png",
-      event: "",
-      onclickWidget: const Sos());
 
   Items item6 = Items(
       title: "Settings",
@@ -73,33 +74,63 @@ class _HomeScreenState extends State<HomeScreen> {
         user_id = value;
       });
     });
+
+    _pageController.addListener(() {
+      setState(() {
+        pageIndex = _pageController.page!.toInt();
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Items> myList = [item3, item4, item7, item6, item8, item5];
-
+    print("-------------${context.locale}");
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(238, 45, 101, 138),
-        title: const Text(
-          "Home",
-          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterDocked,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Attendance()));
+        },
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(100),
+              color: ConstantStrings.kPrimaryColor),
+          child: const Icon(Icons.add),
         ),
-        elevation: 10,
-        actions: const [
-          Padding(
-              padding: EdgeInsets.all(15),
-              child: Icon(
-                Icons.logout,
-                color: Color.fromARGB(255, 255, 255, 255),
-              ))
+      ),
+      bottomNavigationBar: bottomNav(context),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Text(
+          titles[pageIndex],
+          style: TextStyle(
+              color: ConstantStrings.kPrimaryColor,
+              fontSize: 25,
+              fontWeight: FontWeight.bold),
+        ),
+        elevation: 0,
+        actions: [
+          GestureDetector(
+            onTap: () {
+              HttpService.logout(context);
+            },
+            child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(
+                  Icons.logout,
+                  color: ConstantStrings.kPrimaryColor,
+                )),
+          )
         ],
       ),
-      body: user_id == ""
+      body: user_id == null
           ? Container(
               height: double.infinity,
-              color: const Color.fromARGB(204, 41, 108, 139),
+              color: ConstantStrings.kPrimaryColorLite,
               child: Center(
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -112,184 +143,260 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               )))
           : SingleChildScrollView(
-              child: WillPopScope(
-                onWillPop: () async {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text("Are your sure?"),
-                      content: const Text("you want to close the app"),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            SystemNavigator.pop();
-                          },
-                          child: const Text("okay"),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text("Cancel"),
-                        ),
-                      ],
-                    ),
-                  ); // Returning true allows the pop to happen, returning false prevents it.
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ConstantStrings.kPrimaryColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40),
+                    bottomRight: Radius.circular(40),
+                    bottomLeft: Radius.circular(40),
+                  ),
+                ),
+                child: WillPopScope(
+                  onWillPop: () async {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text("Are your sure?"),
+                        content: const Text("you want to close the app"),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              SystemNavigator.pop();
+                            },
+                            child: const Text("okay"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Cancel"),
+                          ),
+                        ],
+                      ),
+                    ); // Returning true allows the pop to happen, returning false prevents it.
 
-                  return true;
-                },
-                child: SizedBox(
+                    return true;
+                  },
                   child: Container(
-                    height: MediaQuery.of(context).size.height,
-                    color: const Color.fromARGB(204, 41, 108, 139),
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 40,
-                        ),
-                        ListTile(
-                            title: const Text(
-                          "Welcome Back",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontFamily: 'Calistoga'),
-                        )),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        SizedBox(
-                            child: Container(
-                          padding: const EdgeInsets.only(
-                              top: 30, right: 10, left: 10, bottom: 20),
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.height * 0.8,
-                          decoration: const BoxDecoration(
-                            color: Color.fromARGB(238, 45, 101, 138),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(40),
-                              topRight: Radius.circular(40),
-                              bottomRight: Radius.circular(40),
-                              bottomLeft: Radius.circular(40),
-                            ),
-                          ),
-                          child: AnimationLimiter(
-                            child: GridView.count(
-                                childAspectRatio: 1.0,
-                                padding:
-                                    const EdgeInsets.only(left: 16, right: 16),
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 18,
-                                mainAxisSpacing: 18,
-                                children: myList.map((data) {
-                                  return AnimationConfiguration.staggeredGrid(
-                                    position: myList.indexOf(data),
-                                    duration:
-                                        const Duration(milliseconds: 1500),
-                                    columnCount: 2,
-                                    child: ScaleAnimation(
-                                      child: FadeInAnimation(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        data.onclickWidget));
-                                          },
-                                          child: Card(
-                                            elevation: 4,
-                                            child: Container(
-                                              decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(300)),
-                                                color: Color.fromARGB(
-                                                    38, 189, 187, 187),
-                                              ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Image.asset(
-                                                    data.img,
-                                                    width: 55,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 14,
-                                                  ),
-                                                  Text(
-                                                    data.title,
-                                                    style: GoogleFonts.openSans(
-                                                        textStyle:
-                                                            const TextStyle(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        8,
-                                                                        47,
-                                                                        80),
-                                                                fontSize: 11,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600)),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                  // Text(
-                                                  //   data.subtitle,
-                                                  //   style: GoogleFonts.openSans(
-                                                  //       textStyle:
-                                                  //           const TextStyle(
-                                                  //               color:
-                                                  //                   Color
-                                                  //                       .fromARGB(
-                                                  //                           255,
-                                                  //                           8,
-                                                  //                           121,
-                                                  //                           212),
-                                                  //               fontSize: 10,
-                                                  //               fontWeight:
-                                                  //                   FontWeight
-                                                  //                       .w600)),
-                                                  // ),
-                                                  // const SizedBox(
-                                                  //   height: 10,
-                                                  // ),
-                                                  // Text(
-                                                  //   data.event,
-                                                  //   style: GoogleFonts.openSans(
-                                                  //       textStyle:
-                                                  //           const TextStyle(
-                                                  //               color:
-                                                  //                   Color
-                                                  //                       .fromARGB(
-                                                  //                           255,
-                                                  //                           7,
-                                                  //                           72,
-                                                  //                           126),
-                                                  //               fontSize: 10,
-                                                  //               fontWeight:
-                                                  //                   FontWeight
-                                                  //                       .w600)),
-                                                  // ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList()),
-                          ),
-                        )),
-                      ],
+                    color: ConstantStrings.lightGrey,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.85,
+                      child: PageView.builder(
+                        itemCount: pages.length,
+                        scrollDirection: Axis.horizontal,
+                        controller: _pageController,
+                        itemBuilder: (context, itemIndex) {
+                          return pages[itemIndex];
+                        },
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
+    );
+  }
+
+  Container bottomNav(BuildContext context) {
+    return Container(
+      height: 60,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          IconButton(
+            enableFeedback: false,
+            onPressed: () {
+              setState(() {
+                _pageController.jumpToPage(0);
+              });
+            },
+            icon: pageIndex == 0
+                ? Icon(
+                    Icons.home_filled,
+                    color: ConstantStrings.kPrimaryColor,
+                    size: 25,
+                  )
+                : Icon(
+                    Icons.home_outlined,
+                    color: ConstantStrings.kPrimaryColorLite,
+                    size: 25,
+                  ),
+          ),
+          IconButton(
+            enableFeedback: false,
+            onPressed: () {
+              setState(() {
+                _pageController.jumpToPage(1);
+              });
+            },
+            icon: pageIndex == 1
+                ? Icon(
+                    Icons.camera_alt_rounded,
+                    color: ConstantStrings.kPrimaryColor,
+                    size: 25,
+                  )
+                : Icon(
+                    Icons.camera_alt_outlined,
+                    color: ConstantStrings.kPrimaryColorLite,
+                    size: 25,
+                  ),
+          ),
+          IconButton(
+            enableFeedback: false,
+            onPressed: () {
+              setState(() {
+                _pageController.jumpToPage(2);
+              });
+            },
+            icon: pageIndex == 2
+                ? Icon(
+                    Icons.notifications,
+                    color: ConstantStrings.kPrimaryColor,
+                    size: 25,
+                  )
+                : Icon(
+                    Icons.notifications_outlined,
+                    color: ConstantStrings.kPrimaryColorLite,
+                    size: 25,
+                  ),
+          ),
+          IconButton(
+            enableFeedback: false,
+            onPressed: () {
+              setState(() {
+                _pageController.jumpToPage(3);
+              });
+            },
+            icon: pageIndex == 3
+                ? Icon(
+                    Icons.settings,
+                    color: ConstantStrings.kPrimaryColor,
+                    size: 25,
+                  )
+                : Icon(
+                    Icons.settings_outlined,
+                    color: ConstantStrings.kPrimaryColorLite,
+                    size: 25,
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LandingScreen extends StatefulWidget {
+  LandingScreen({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
+  String siteName = "";
+  String siteNameAr = "";
+  late SharedPreferences pref;
+
+  initSharedPrefs() async {
+    pref = await SharedPreferences.getInstance();
+
+    setState(() {
+      siteName = pref.getString("siteName").toString();
+      siteNameAr = pref.getString("siteNameAr").toString();
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initSharedPrefs();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print("---------locale---${context.locale}");
+    return SizedBox(
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 40,
+              ),
+              SizedBox(
+                  height: 150,
+                  width: double.infinity,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: ConstantStrings.kPrimaryColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: ConstantStrings.kPrimaryColorLite,
+                            blurRadius: 5.0,
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "My site",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w200),
+                                ),
+                                Icon(
+                                  Icons.pin_drop_rounded,
+                                  color: Colors.white,
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                            ),
+                            child: Text(
+                                context.locale.toString() == "en_US"
+                                    ? siteName
+                                    : siteNameAr,
+                                style: const TextStyle(
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.w300,
+                                    color: const Color.fromARGB(
+                                        255, 255, 255, 255))),
+                          ),
+                        ]),
+                  )),
+              const SizedBox(
+                height: 30,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

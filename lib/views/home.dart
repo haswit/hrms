@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:hrms_app/constants.dart';
 import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/views/gps_alert.dart';
 import 'package:hrms_app/views/home_screen.dart';
@@ -21,11 +22,11 @@ class Home extends StatefulWidget {
 
   //final double latitude = 17.390689;
 
-  final double innerRadius;
-  final double outerRadius;
-  final double longitude;
-  final double latitude;
-  final double gain;
+  final dynamic innerRadius;
+  final dynamic outerRadius;
+  final dynamic longitude;
+  final dynamic latitude;
+  final dynamic gain;
   const Home(
       {Key? key,
       required this.latitude,
@@ -42,17 +43,17 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late double _latitude;
-  late double _longitude;
+  late dynamic _latitude;
+  late dynamic _longitude;
   late LatLng _center;
   late LatLng mapCircle;
-  late double _innerRadius;
-  late double _outerRadius;
+  late dynamic _innerRadius;
+  late dynamic _outerRadius;
   // ignore: unused_field
-  late double _gain;
+  late dynamic _gain;
 
-  _HomeState(double centerX, double centerY, double innerRadius,
-      double outerRadius, double gain) {
+  _HomeState(dynamic centerX, dynamic centerY, dynamic innerRadius,
+      dynamic outerRadius, dynamic gain) {
     _latitude = centerX;
     _longitude = centerY;
     _innerRadius = innerRadius;
@@ -162,16 +163,16 @@ class _HomeState extends State<Home> {
 
     intSharedPrefs();
 
-    var _sessionsData = HttpService().getSessions();
-    _sessionsData.then((value) {
-      if (value.length > 1) {
-        if (value[value.length - 1]['session'] == "IN") {
-          setState(() {
-            //alreadyIn = true;
-          });
-        }
-      }
-    });
+    // var _sessionsData = HttpService().getSessions();
+    // _sessionsData.then((value) {
+    //   if (value.length > 1) {
+    //     if (value[value.length - 1]['session'] == "IN") {
+    //       setState(() {
+    //         //alreadyIn = true;
+    //       });
+    //     }
+    //   }
+    // });
 
     AwesomeNotifications().isNotificationAllowed().then(
       (isAllowed) {
@@ -251,38 +252,41 @@ class _HomeState extends State<Home> {
 
     return SafeArea(
       child: Scaffold(
-          // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          // floatingActionButton: FloatingActionButton(
-          //   child: Icon(Icons.arrow_upward_sharp),
-          //   onPressed: () {
-          //     bottomModalSheet();
-          //   },
-          // ),
-          appBar: headerNav("ATTENDANCE"),
-          drawer: const MyDrawer(),
-          body: Container(
-            child: WillPopScope(
-              onWillPop: () async {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()));
-                return true;
+          appBar: AppBar(
+            title: Text(
+              "Attendance",
+              style: TextStyle(color: ConstantStrings.kPrimaryColor),
+            ),
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
               },
-              child: Container(
-                color: Colors.white,
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  child: Stack(children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.74,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                            right: 25,
-                            left: 25,
-                            top: MediaQuery.of(context).size.height * 0.18),
+              icon: Icon(
+                Icons.chevron_left,
+                color: ConstantStrings.kPrimaryColor,
+              ),
+            ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+          ),
+          backgroundColor: Colors.white,
+          body: WillPopScope(
+            onWillPop: () async {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()));
+              return true;
+            },
+            child: Column(
+              children: [
+                Container(
+                  child: SizedBox(
+                    child: Stack(children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.88,
                         child: Container(
-                          padding: const EdgeInsets.all(5),
+                          padding: EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: Colors.grey, width: 1)),
                           child: GoogleMap(
                               minMaxZoomPreference:
@@ -304,31 +308,12 @@ class _HomeState extends State<Home> {
                               )),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        width: MediaQuery.of(context).size.width,
-                        child: DraggableScrollableSheet(
-                          expand: false,
-                          initialChildSize: 0.30,
-                          minChildSize: 0.15,
-                          builder: (BuildContext context,
-                              ScrollController scrollController) {
-                            return SingleChildScrollView(
-                              controller: scrollController,
-                              child: const CustomScrollViewContent(),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    HeaderButtons(
-                        inLoginZone: inLoginZone, alreadyIn: alreadyIn),
-                  ]),
+                      HeaderButtons(
+                          inLoginZone: inLoginZone, alreadyIn: alreadyIn),
+                    ]),
+                  ),
                 ),
-              ),
+              ],
             ),
           )),
     );
@@ -346,7 +331,7 @@ class HeaderButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
+      width: double.infinity,
       child: FittedBox(
         child: Card(
           shadowColor: Colors.white,
@@ -435,15 +420,15 @@ class LoginButtons extends StatelessWidget {
                 onPressed: inLoginZone
                     ? !alreadyIn
                         ? () async {
-                            await availableCameras()
-                                .then((value) => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CameraPage(
-                                        session: "IN",
-                                        cameras: value,
-                                      ),
-                                    )));
+                            // await availableCameras()
+                            //     .then((value) => Navigator.push(
+                            //         context,
+                            //         MaterialPageRoute(
+                            //           builder: (context) => CameraPage(
+                            //             session: "IN",
+                            //             cameras: value,
+                            //           ),
+                            //         )));
                           }
                         : null
                     : null,
@@ -463,15 +448,15 @@ class LoginButtons extends StatelessWidget {
                 onPressed: inLoginZone
                     ? !alreadyIn
                         ? () async {
-                            await availableCameras()
-                                .then((value) => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CameraPage(
-                                        session: "OUT",
-                                        cameras: value,
-                                      ),
-                                    )));
+                            // await availableCameras()
+                            //     .then((value) => Navigator.push(
+                            //         context,
+                            //         MaterialPageRoute(
+                            //           builder: (context) => CameraPage(
+                            //             session: "OUT",
+                            //             cameras: value,
+                            //           ),
+                            //         )));
                           }
                         : null
                     : null,
@@ -511,241 +496,6 @@ class OutOfRadiusMessage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Content of the DraggableBottomSheet's child SingleChildScrollView
-class CustomScrollViewContent extends StatelessWidget {
-  const CustomScrollViewContent({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      shadowColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      margin: const EdgeInsets.all(0),
-      child: Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-        ),
-        child: const CustomInnerContent(),
-      ),
-    );
-  }
-}
-
-class CustomInnerContent extends StatelessWidget {
-  const CustomInnerContent({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: const <Widget>[
-        SizedBox(height: 12),
-        CustomDraggingHandle(),
-        SizedBox(height: 16),
-        // MySitesTitle(),
-        // SizedBox(height: 16),
-        // MySites(),
-        SizedBox(height: 24),
-        SessionList(),
-        SizedBox(height: 16),
-        TodaysSessionsListView(),
-        SizedBox(height: 24),
-      ],
-    );
-  }
-}
-
-class CustomDraggingHandle extends StatelessWidget {
-  const CustomDraggingHandle({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 5,
-      width: 30,
-      decoration: BoxDecoration(
-          color: Colors.grey[200], borderRadius: BorderRadius.circular(16)),
-    );
-  }
-}
-
-class MySitesTitle extends StatelessWidget {
-  const MySitesTitle({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const Text("My Sites",
-            style: TextStyle(fontSize: 22, color: Colors.black45)),
-        const SizedBox(width: 8),
-        Container(
-          height: 30,
-          width: 30,
-          child: const Icon(Icons.map, size: 12, color: Colors.black54),
-          decoration: BoxDecoration(
-              color: Colors.grey[200], borderRadius: BorderRadius.circular(16)),
-        ),
-      ],
-    );
-  }
-}
-
-class MySites extends StatelessWidget {
-  const MySites({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: const <Widget>[
-            CustomSiteChip(
-              title: "Site A",
-            ),
-            SizedBox(width: 12),
-            CustomSiteChip(
-              title: "Site B",
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SessionList extends StatelessWidget {
-  const SessionList({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 44, right: 44),
-      //only to left align the text
-      child: Row(
-        children: const <Widget>[
-          Text("Today's sessions", style: TextStyle(fontSize: 14))
-        ],
-      ),
-    );
-  }
-}
-
-class TodaysSessionsListView extends StatefulWidget {
-  const TodaysSessionsListView({Key? key}) : super(key: key);
-
-  @override
-  State<TodaysSessionsListView> createState() => _TodaysSessionsListViewState();
-}
-
-class _TodaysSessionsListViewState extends State<TodaysSessionsListView> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: MediaQuery.of(context).size.height * 0.3,
-          padding: const EdgeInsets.only(left: 25, right: 25, bottom: 10),
-          child: FutureBuilder(
-            future: HttpService().getSessions(),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
-                // if (snapshot.data[snapshot.data.length - 1]
-                //         ['session'] ==
-                //     "IN") {
-                //   alreadyIn = true;
-                // }
-
-                return ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                                width: .2, color: Colors.lightBlue.shade900),
-                          ),
-                        ),
-                        child: ListTile(
-                          title: Text(snapshot.data[index]['session']),
-                          subtitle: Text(snapshot.data[index]['date_time']),
-                          leading: Container(
-                            margin: const EdgeInsets.only(top: 5),
-                            decoration: BoxDecoration(
-                                color: snapshot.data[index]['session'] == "IN"
-                                    ? Colors.green
-                                    : Colors.red,
-                                borderRadius: BorderRadius.circular(50)),
-                            width: 20,
-                            height: 20,
-                          ),
-                        ),
-                      );
-                    });
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class CustomSiteChip extends StatelessWidget {
-  final String title;
-
-  const CustomSiteChip({Key? key, required this.title}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        height: 50,
-        width: 120,
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(40, 33, 149, 243),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              color: Colors.black,
-              icon: const Icon(Icons.pin_drop),
-              onPressed: () {},
-            ),
-            Text(
-              title,
-              style: const TextStyle(color: Colors.black),
-            )
-          ],
-        ));
-  }
-}
-
-class CustomFeaturedItem extends StatelessWidget {
-  const CustomFeaturedItem({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const ListTile(
-      title: Text("Test"),
     );
   }
 }

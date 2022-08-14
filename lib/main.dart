@@ -12,7 +12,7 @@ import 'package:cron/cron.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:geofencing/geofencing.dart';
+// import 'package:geofencing/geofencing.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hrms_app/services/http_service.dart';
@@ -97,22 +97,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String geofenceState = 'N/A';
   List<String> registeredGeofences = [];
-  late double latitude;
-  late double longitude;
-  late double radius;
+  double latitude = 1.10;
+  double longitude = 1.10;
+  double radius = 200;
   ReceivePort port = ReceivePort();
-  final List<GeofenceEvent> triggers = <GeofenceEvent>[
-    GeofenceEvent.enter,
-    GeofenceEvent.dwell,
-    GeofenceEvent.exit
-  ];
-  final AndroidGeofencingSettings androidSettings = AndroidGeofencingSettings(
-      initialTrigger: <GeofenceEvent>[
-        GeofenceEvent.enter,
-        GeofenceEvent.exit,
-        GeofenceEvent.dwell
-      ],
-      loiteringDelay: 1000 * 60);
+  // final List<GeofenceEvent> triggers = <GeofenceEvent>[
+  //   GeofenceEvent.enter,
+  //   GeofenceEvent.dwell,
+  //   GeofenceEvent.exit
+  // ];
+  // final AndroidGeofencingSettings androidSettings = AndroidGeofencingSettings(
+  //     initialTrigger: <GeofenceEvent>[
+  //       GeofenceEvent.enter,
+  //       GeofenceEvent.exit,
+  //       GeofenceEvent.dwell
+  //     ],
+  //     loiteringDelay: 1000 * 60);
 
   bool isLoaded = false;
   bool languageSelected = false;
@@ -182,14 +182,16 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
 
-    final cron = Cron();
-    cron.schedule(Schedule.parse('*/1 * * * *'), () async {
-      // print('every three minutes');
-      if (kDebugMode) {
-        print("CRON EXECUTING");
-      }
-      cronJob();
-    });
+    if (isLoggedIn) {
+      final cron = Cron();
+      cron.schedule(Schedule.parse('*/1 * * * *'), () async {
+        // print('every three minutes');
+        if (kDebugMode) {
+          print("CRON EXECUTING");
+        }
+        cronJob();
+      });
+    }
   }
 
   String _notificationMsg = 'No Message';
@@ -212,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => GpsAlert()));
       } else {
-        initPlatformState();
+        // initPlatformState();
         registerTracking();
       }
     }
@@ -224,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => GpsAlert()));
       } else {
-        initPlatformState();
+        // initPlatformState();
         registerTracking();
       }
     }
@@ -253,19 +255,19 @@ class _MyHomePageState extends State<MyHomePage> {
     getUser();
   }
 
-  static void callback(List<String> ids, Location l, GeofenceEvent e) async {
-    print('Fences: $ids Location $l Event: $e');
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('geofencing_send_port');
-    send?.send(e.toString());
-  }
+  // static void callback(List<String> ids, Location l, GeofenceEvent e) async {
+  //   print('Fences: $ids Location $l Event: $e');
+  //   final SendPort? send =
+  //       IsolateNameServer.lookupPortByName('geofencing_send_port');
+  //   send?.send(e.toString());
+  // }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    print('Initializing...');
-    await GeofencingManager.initialize();
-    print('Initialization done');
-  }
+  // Future<void> initPlatformState() async {
+  //   print('Initializing...');
+  //   await GeofencingManager.initialize();
+  //   print('Initialization done');
+  // }
 
   String? numberValidator(String value) {
     if (value == null) {
@@ -288,28 +290,28 @@ class _MyHomePageState extends State<MyHomePage> {
     if (radius == null) {
       setState(() => radius = 0.0);
     }
-    GeofencingManager.registerGeofence(
-            GeofenceRegion('office1', latitude, longitude, radius, triggers,
-                androidSettings: androidSettings),
-            callback)
-        .then((_) {
-      GeofencingManager.getRegisteredGeofenceIds().then((value) {
-        setState(() {
-          registeredGeofences = value;
-        });
-      });
-    });
+    // GeofencingManager.registerGeofence(
+    //         GeofenceRegion('office1', latitude, longitude, radius, triggers,
+    //             androidSettings: androidSettings),
+    //         callback)
+    //     .then((_) {
+    //   GeofencingManager.getRegisteredGeofenceIds().then((value) {
+    //     setState(() {
+    //       registeredGeofences = value;
+    //     });
+    // });
+    // });
   }
 
-  unRegisterTracking() {
-    GeofencingManager.removeGeofenceById('office1').then((_) {
-      GeofencingManager.getRegisteredGeofenceIds().then((value) {
-        setState(() {
-          registeredGeofences = value;
-        });
-      });
-    });
-  }
+  // unRegisterTracking() {
+  //   GeofencingManager.removeGeofenceById('office1').then((_) {
+  //     GeofencingManager.getRegisteredGeofenceIds().then((value) {
+  //       setState(() {
+  //         registeredGeofences = value;
+  //       });
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
