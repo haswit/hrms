@@ -1,4 +1,33 @@
 {
-    "warning" : "يرجى الانتقال إلى منطقة تسجيل الدخول لإدخال الحضور",
-    "language": "لغة"
-} 
+    "@@locale": "ar",
+    "AppStrings": {
+        "key": "Arabic",
+        "cinTitle": "رقم العميل",
+        "cinError": "الرجاء إدخال رقم العميل",
+        "cinHint": "أدخل رقم العميل",
+        "idTitle": "رقم الموظف",
+        "idError": "الرجاء إدخال رقم الموظف",
+        "idHint": "أدخل رقم الموظف",
+        "passwordTitle": "كلمة المرور",
+        "passwordError": "الرجاء إدخال كلمة المرور",
+        "passwordHint": "أدخل كلمة المرور",
+        "continue": "المتابعة",
+        "attendance": "الحضور",
+        "languageTitle": "أختر اللغة",
+        "languageSubtitle": "تود استخدام التطبيق باللغة",
+        "english": "الإنجليزية",
+        "arabic": "العربية",
+        "homeTitle": "الصفحة الرئيسية",
+        "notificationTitle": "اخطار",
+        "incidentTitle": "الإبلاغ عن واقعة",
+        "langugeTitle": "اللغة",
+        "incedentInput1": "أدخل العنوان",
+        "incedentInput2": "أدخل الرسالة",
+        "incedentInput3": "التقاط صورة",
+        "submit": "إرسال",
+        "loginZone": "منطقة تسجيل الدخول",
+        "officeZone": "منطقة المكتب",
+        "checkIn": "تسجيل الدخول",
+        "checkOut": "تسجيل الخروج"
+    }
+}
