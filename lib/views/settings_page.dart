@@ -60,14 +60,14 @@ class _SettingsState extends State<Settings> {
                   height: MediaQuery.of(context).size.height * 0.03,
                 ),
                 Text(
-                  "Choose Language",
+                  "AppStrings.languageTitle".tr(),
                   style: TextStyle(
                       color: ConstantStrings.kPrimaryColorLite,
                       fontSize: 28,
                       fontFamily: 'Calistoga'),
                 ),
                 Text(
-                  "you want to use the app in",
+                  "AppStrings.languageSubtitle".tr(),
                   style: TextStyle(
                       color: ConstantStrings.kPrimaryColorLite,
                       fontSize: 15,
@@ -125,7 +125,7 @@ class _SettingsState extends State<Settings> {
                                               : Colors.black),
                                     ),
                                     Text(
-                                      "English",
+                                      "AppStrings.english".tr(),
                                       style: TextStyle(
                                           color: _selected == "US"
                                               ? Colors.white
@@ -185,7 +185,7 @@ class _SettingsState extends State<Settings> {
                                               : Colors.black),
                                     ),
                                     Text(
-                                      "Arabic",
+                                      "AppStrings.arabic".tr(),
                                       style: TextStyle(
                                           color: _selected == "UAE"
                                               ? Colors.white
@@ -223,7 +223,7 @@ class _SettingsState extends State<Settings> {
                           );
                         }
                       },
-                      text: "Save"),
+                      text: "AppStrings.save".tr()),
                 ),
               ],
             )),

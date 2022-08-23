@@ -70,7 +70,7 @@ class _HomeState extends State<Home> {
   late GoogleMapController mapController;
   double _mapZoom = 1.0;
 
-  var inLoginZone = false;
+  var inLoginZone = true;
   double h = 1.0;
   // ignore: unused_field
   late LatLng _cameraPosition;
@@ -254,7 +254,7 @@ class _HomeState extends State<Home> {
       child: Scaffold(
           appBar: AppBar(
             title: Text(
-              "Attendance",
+              "AppStrings.attendance".tr(),
               style: TextStyle(color: ConstantStrings.kPrimaryColor),
             ),
             leading: IconButton(
@@ -377,7 +377,7 @@ class RadiusInfoChips extends StatelessWidget {
               height: 20,
               width: 20,
             ),
-            const Text("Login zone"),
+            Text("AppStrings.loginZone".tr()),
             const SizedBox(
               width: 20,
             ),
@@ -389,7 +389,7 @@ class RadiusInfoChips extends StatelessWidget {
               height: 20,
               width: 20,
             ),
-            const Text("Office zone")
+            Text("AppStrings.officeZone".tr())
           ],
         )
       ],
@@ -417,23 +417,25 @@ class LoginButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                     shadowColor: Colors.green,
                     primary: const Color.fromARGB(221, 27, 202, 65)),
-                onPressed: inLoginZone
-                    ? !alreadyIn
-                        ? () async {
-                            // await availableCameras()
-                            //     .then((value) => Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //           builder: (context) => CameraPage(
-                            //             session: "IN",
-                            //             cameras: value,
-                            //           ),
-                            //         )));
-                          }
-                        : null
-                    : null,
-                child: const Text(
-                  "IN",
+                onPressed:
+                    // inLoginZone
+                    //     ? !alreadyIn
+                    //         ?
+                    () async {
+                  await availableCameras().then((value) => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CameraPage(
+                          session: "IN",
+                          cameras: value,
+                        ),
+                      )));
+                }
+                //     : null
+                // : null
+                ,
+                child: Text(
+                  "AppStrings.checkIn".tr(),
                   style: TextStyle(fontSize: 25),
                 ))),
         const SizedBox(
@@ -460,7 +462,8 @@ class LoginButtons extends StatelessWidget {
                           }
                         : null
                     : null,
-                child: const Text("OUT", style: TextStyle(fontSize: 25)))),
+                child: Text("AppStrings.checkOut".tr(),
+                    style: TextStyle(fontSize: 25)))),
       ]),
     );
   }
@@ -487,7 +490,7 @@ class OutOfRadiusMessage extends StatelessWidget {
                 child: Icon(Icons.info),
               ),
               Text(
-                "warning".tr().toString(),
+                "AppStrings.locationWarning".tr().toString(),
                 style: const TextStyle(
                   color: Color.fromARGB(255, 7, 7, 7),
                 ),

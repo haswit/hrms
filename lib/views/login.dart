@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_app/constants.dart';
 import 'package:hrms_app/services/my_shared_prederences.dart';
@@ -117,7 +118,7 @@ class _LoginState extends State<Login> {
                                 padding:
                                     EdgeInsets.only(left: 18.0, right: 18.0),
                                 child: Text(
-                                  'Sign In',
+                                  'AppStrings.signinTitle'.tr(),
                                   style: TextStyle(
                                     color: ConstantStrings.kPrimaryColor,
                                     fontSize: 40,
@@ -151,7 +152,8 @@ class _LoginState extends State<Login> {
                                                     padding: EdgeInsets.only(
                                                         bottom: 8.0),
                                                     child: Text(
-                                                      "CIN Number",
+                                                      "AppStrings.cinTitle"
+                                                          .tr(),
                                                       style: TextStyle(
                                                           color: ConstantStrings
                                                               .kPrimaryColor,
@@ -163,13 +165,15 @@ class _LoginState extends State<Login> {
                                                   CustomInput(
                                                     validator: (value) {
                                                       if (value == "") {
-                                                        return "Please Enter CIN";
+                                                        return "AppStrings.cinError"
+                                                            .tr();
                                                       }
                                                     },
                                                     controller: _cinController,
                                                     suffix: null,
                                                     showText: true,
-                                                    hint: 'Enter CIN Number',
+                                                    hint: 'AppStrings.cinHint'
+                                                        .tr(),
                                                   ),
                                                 ],
                                               ),
@@ -184,7 +188,8 @@ class _LoginState extends State<Login> {
                                                       padding: EdgeInsets.only(
                                                           bottom: 8.0),
                                                       child: Text(
-                                                        "ID",
+                                                        "AppStrings.idTitle"
+                                                            .tr(),
                                                         style: TextStyle(
                                                             color: ConstantStrings
                                                                 .kPrimaryColor,
@@ -197,13 +202,15 @@ class _LoginState extends State<Login> {
                                                     CustomInput(
                                                       validator: (value) {
                                                         if (value == "") {
-                                                          return "Please Enter ID";
+                                                          return "AppStrings.idError"
+                                                              .tr();
                                                         }
                                                       },
                                                       controller: _idController,
                                                       suffix: null,
                                                       showText: true,
-                                                      hint: 'Enter ID',
+                                                      hint: 'AppStrings.idHint'
+                                                          .tr(),
                                                     ),
                                                   ],
                                                 ),
@@ -216,7 +223,8 @@ class _LoginState extends State<Login> {
                                                     padding: EdgeInsets.only(
                                                         bottom: 8.0),
                                                     child: Text(
-                                                      "Password",
+                                                      "AppStrings.passwordTitle"
+                                                          .tr(),
                                                       style: TextStyle(
                                                           color: ConstantStrings
                                                               .kPrimaryColor,
@@ -228,7 +236,8 @@ class _LoginState extends State<Login> {
                                                   CustomInput(
                                                     validator: (value) {
                                                       if (value == "") {
-                                                        return "Please Enter Password";
+                                                        return "AppStrings.passwordError"
+                                                            .tr();
                                                       }
                                                     },
                                                     controller:
@@ -253,7 +262,9 @@ class _LoginState extends State<Login> {
                                                       },
                                                     ),
                                                     showText: _passwordVisible,
-                                                    hint: 'Enter Password',
+                                                    hint:
+                                                        'AppStrings.passwordHint'
+                                                            .tr(),
                                                   ),
                                                   const SizedBox(
                                                     height: 40,
@@ -268,7 +279,9 @@ class _LoginState extends State<Login> {
                                                                 .width *
                                                             0.8,
                                                     child: CustomButton(
-                                                        text: "Continue",
+                                                        text:
+                                                            "AppStrings.continue"
+                                                                .tr(),
                                                         onclickFunction: () {
                                                           AuthService().authUser(
                                                               _cinController

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_app/constants.dart';
 import 'package:hrms_app/services/http_service.dart';
@@ -113,7 +114,7 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
                   controller: subjectController,
                   decoration: InputDecoration(
                       prefix: null,
-                      hintText: "Enter Subject",
+                      hintText: "AppStrings.incedentInput1".tr(),
                       hintStyle:
                           TextStyle(color: ConstantStrings.kPrimaryColor))),
             ),
@@ -127,7 +128,7 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
                   minLines: 5,
                   maxLines: 10,
                   decoration: InputDecoration(
-                      hintText: "Enter Message",
+                      hintText: "AppStrings.incedentInput2".tr(),
                       hintStyle:
                           TextStyle(color: ConstantStrings.kPrimaryColor))),
             ),
@@ -153,7 +154,7 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
                               const SizedBox(
                                 width: 15,
                               ),
-                              Text("Capture Image",
+                              Text("AppStrings.incedentInput3".tr(),
                                   style: TextStyle(
                                       color: ConstantStrings.kPrimaryColor))
                             ],
@@ -180,7 +181,7 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
                               child: Row(
                                 children: [
                                   const Icon(Icons.replay),
-                                  const Text("Retake"),
+                                  Text("AppStrings.retake".tr()),
                                 ],
                               )),
                         )
@@ -195,7 +196,7 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
                   HttpService.submitIncedent(context, subjectController.text,
                       messageController.text, pictureFile);
                 },
-                text: "Submit")
+                text: "AppStrings.submit".tr())
           ],
         ),
       )),

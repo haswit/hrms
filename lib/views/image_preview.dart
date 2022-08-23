@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:hrms_app/services/http_service.dart';
@@ -24,8 +25,7 @@ class Picture extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
-          appBar: headerNav("SUBMIT SESSION"),
-          drawer: const MyDrawer(),
+          appBar: headerNav("AppStrings.submitSession".tr()),
           body: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -116,7 +116,7 @@ class Picture extends StatelessWidget {
                         HttpService.submitSession(context, session!,
                             _formatterTime, formatted, pictureFile);
                       },
-                      text: "Submit"),
+                      text: "AppStrings.submit".tr()),
                 )
               ],
             ),

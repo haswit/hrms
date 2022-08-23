@@ -104,34 +104,51 @@ class HttpService {
 
   static submitSession(
       context, String loginSession, String time, String date, image) async {
-    const String baseUrl = "https://lghrms.live/";
+    var sessn = loginSession == "IN" ? "checkInEmpoyee" : "checkOutEmpoyee";
+    String url = "${ConstantStrings.baseUrl}/${sessn}";
 
-    var url = baseUrl + "add-session";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token").toString();
 
-    MySharedPreferences.instance.getStringValue("id").then((id) async {
-      http.MultipartRequest request =
-          http.MultipartRequest('POST', Uri.parse(url));
-      request.fields.addAll({
-        "id": id,
-        "login_session": loginSession,
-        "date_time": date + " " + time,
-      });
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'images',
-          image?.path,
-          contentType: MediaType('application', 'jpeg'),
-        ),
-      );
-      http.StreamedResponse r = await request.send();
-
-      if (r.statusCode == 200) {
-        await EasyLoading.showSuccess("Submitted Successfully");
-
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyHomePage()));
-      }
+    var id = prefs.getString("id");
+    http.MultipartRequest request =
+        http.MultipartRequest('POST', Uri.parse(url));
+    request.fields.addAll({
+      "id": id.toString(),
+      "employeeId": "",
+      "name": "string",
+      "date": "2022-08-10",
+      "inTime": loginSession == "IN" ? date : "",
+      "outTime": loginSession != "IN" ? date : "",
+      "attnFlag": loginSession,
+      "shiftId": "0",
+      "siteCode": "string",
+      "shiftNumber": "0"
     });
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    request.headers.addAll(headers);
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'images',
+        image?.path,
+        contentType: MediaType('application', 'jpeg'),
+      ),
+    );
+    http.StreamedResponse r = await request.send();
+
+    if (r.statusCode == 200) {
+      await EasyLoading.showSuccess("Submitted Successfully");
+
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => MyHomePage()));
+    } else {
+      await EasyLoading.showError("Something went wrong!");
+      print(r.statusCode);
+    }
   }
 
   static logout(context) async {
@@ -141,7 +158,6 @@ class HttpService {
     String cin = prefs.getString("cin").toString();
 
     final url = Uri.parse('${ConstantStrings.baseUrl}/Logout');
-
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
@@ -229,14 +245,24 @@ class HttpService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? id = prefs.getString("id");
 
+    String token = prefs.getString("token").toString();
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
     try {
       http.MultipartRequest request = http.MultipartRequest(
-          'POST', Uri.parse('http://lghrms.live/add-incident'));
+        'POST',
+        Uri.parse('${ConstantStrings.baseUrl}/incidentReport'),
+      );
+
       request.fields.addAll({
-        "id": id.toString(),
-        "date_time": getDateTime(),
-        "message": message,
-        "subject": subject
+        "description": message,
+        "title": subject,
+        "siteGeoLatitude": "1.10",
+        "siteGeoLongitude": "1.10",
       });
       request.files.add(
         await http.MultipartFile.fromPath(
@@ -245,6 +271,7 @@ class HttpService {
           contentType: MediaType('application', 'jpeg'),
         ),
       );
+      request.headers.addAll(headers);
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
@@ -252,6 +279,9 @@ class HttpService {
 
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => MyHomePage()));
+      } else {
+        print(response.statusCode);
+        await EasyLoading.showError("Something went wrong");
       }
     } catch (e) {
       if (kDebugMode) {

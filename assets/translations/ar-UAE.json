@@ -1,7 +1,6 @@
 {
-    "@@locale": "ar",
     "AppStrings": {
-        "key": "Arabic",
+        "signinTitle": "تسجيل الدخول",
         "cinTitle": "رقم العميل",
         "cinError": "الرجاء إدخال رقم العميل",
         "cinHint": "أدخل رقم العميل",
@@ -15,6 +14,7 @@
         "attendance": "الحضور",
         "languageTitle": "أختر اللغة",
         "languageSubtitle": "تود استخدام التطبيق باللغة",
+        "settingsTitle" : "إعدادات ",
         "english": "الإنجليزية",
         "arabic": "العربية",
         "homeTitle": "الصفحة الرئيسية",
@@ -28,6 +28,13 @@
         "loginZone": "منطقة تسجيل الدخول",
         "officeZone": "منطقة المكتب",
         "checkIn": "تسجيل الدخول",
-        "checkOut": "تسجيل الخروج"
+        "checkOut": "تسجيل الخروج",
+        "save" : "حفظ",
+        "retake" : "أعد أخذ",
+        "mysite" : "موقعي",
+        "recentActivities": "أنشطة حالية",
+        "locationWarning": "الرجاء الانتقال إلى منطقة تسجيل الدخول",
+        "submitSession": "إرسال الجلسة",
+        "entry" : "دخول"
     }
 }

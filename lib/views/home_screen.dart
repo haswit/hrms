@@ -34,36 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
     const Settings(),
   ];
 
-  final titles = ["Home", "Incident Report", "Notifications", "Settings"];
-
-  // ignore: unnecessary_new
-  Items item3 = new Items(
-      title: "Attendance",
-      subtitle: "Add IN - OUT entries",
-      img: "assets/media/map.png",
-      event: "",
-      onclickWidget: const Attendance());
-
-  Items item6 = Items(
-      title: "Settings",
-      subtitle: "Change language",
-      img: "assets/media/setting.png",
-      event: "",
-      onclickWidget: const Settings());
-
-  Items item7 = Items(
-      title: "Report Incedent",
-      subtitle: "Submit an incedent",
-      img: "assets/media/info.png",
-      event: "",
-      onclickWidget: const SubmitIncedent());
-
-  Items item8 = Items(
-      title: "Notifications",
-      subtitle: "Check out notifications",
-      img: "assets/media/notification.png",
-      event: "3 notifications",
-      onclickWidget: const NotificationScreen());
+  final titles = [
+    "AppStrings.homeTitle".tr(),
+    "AppStrings.incidentTitle".tr(),
+    "AppStrings.notificationTitle".tr(),
+    "AppStrings.settingsTitle".tr()
+  ];
 
   @override
   void initState() {
@@ -365,7 +341,7 @@ class _LandingScreenState extends State<LandingScreen> {
                               width: 1.5, color: Colors.purpleAccent)),
                     ),
                     child: Text(
-                      "Recent Activities",
+                      "AppStrings.recentActivities".tr(),
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 22,
@@ -407,8 +383,8 @@ class _LandingScreenState extends State<LandingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "My site",
+                  Text(
+                    "AppStrings.mysite".tr(),
                     style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,

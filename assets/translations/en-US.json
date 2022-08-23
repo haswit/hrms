@@ -1,7 +1,7 @@
 {
-    "@@locale": "en",
-    "AppStrings": {
-        "key": "English",
+        "AppStrings": {
+
+        "signinTitle": "Sign In",
         "cinTitle": "CIN Number",
         "cinError": "Please Enter CIN",
         "cinHint": "Enter CIN Number",
@@ -15,6 +15,7 @@
         "attendance": "Attendance",
         "languageTitle": "Choose Language",
         "languageSubtitle": "you want to use app in",
+        "settingsTitle" : "Settings",
         "english": "English",
         "arabic": "Arabic",
         "homeTitle": "Home",
@@ -28,6 +29,13 @@
         "loginZone": "Login Zone",
         "officeZone": "Office Zone",
         "checkIn": "Check In",
-        "checkOut": "Check Out"
+        "checkOut": "Check Out",
+        "save" : "Save",
+        "retake" : "Retake",
+        "mysite" : "My Site",
+        "recentActivities" : "Recent Activities",
+        "locationWarning" : "Please move into login zone",
+        "submitSession" : "Submit session",
+        "entry" : "Entry"
     }
 }
