@@ -10,11 +10,11 @@ class Attendance extends StatefulWidget {
 }
 
 class _AttendanceState extends State<Attendance> {
-  late double? latitude;
-  late double? longitude;
-  late double? gain;
-  late double? innerRadius;
-  late double? outerRadius;
+  late dynamic latitude;
+  late dynamic longitude;
+  late dynamic gain;
+  late dynamic innerRadius;
+  late dynamic outerRadius;
   bool loaded = false;
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -25,6 +25,9 @@ class _AttendanceState extends State<Attendance> {
       innerRadius = prefs.getDouble('innerRadius');
       outerRadius = prefs.getDouble('outerRadius');
       loaded = true;
+
+      print(
+          "---loaded, $latitude, $longitude, $gain, $innerRadius, $outerRadius");
     });
   }
 
@@ -37,14 +40,14 @@ class _AttendanceState extends State<Attendance> {
 
   @override
   Widget build(BuildContext context) {
-    return !loaded
-        ? Center(child: CircularProgressIndicator())
+    return loaded == false
+        ? const Center(child: CircularProgressIndicator())
         : Home(
-            latitude: latitude!,
-            longitude: longitude!,
-            gain: gain!,
-            innerRadius: innerRadius!,
-            outerRadius: outerRadius!,
+            latitude: latitude,
+            longitude: longitude,
+            gain: gain,
+            innerRadius: innerRadius,
+            outerRadius: outerRadius,
           );
   }
 }

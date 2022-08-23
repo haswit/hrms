@@ -1,4 +1,33 @@
 {
-    "warning" : "Please move into login zone to enter the attendance",
-    "language": "Language"
+    "@@locale": "en",
+    "AppStrings": {
+        "key": "English",
+        "cinTitle": "CIN Number",
+        "cinError": "Please Enter CIN",
+        "cinHint": "Enter CIN Number",
+        "idTitle": "ID",
+        "idError": "Please Enter ID",
+        "idHint": "Enter ID",
+        "passwordTitle": "Password",
+        "passwordError": "Please Enter Password",
+        "passwordHint": "Enter Password",
+        "continue": "Continue",
+        "attendance": "Attendance",
+        "languageTitle": "Choose Language",
+        "languageSubtitle": "you want to use app in",
+        "english": "English",
+        "arabic": "Arabic",
+        "homeTitle": "Home",
+        "notificationTitle": "Notification",
+        "incidentTitle": "Incident Report",
+        "langugeTitle": "Language",
+        "incedentInput1": "Enter subject",
+        "incedentInput2": "Enter Message",
+        "incedentInput3": "Capture Image",
+        "submit": "Submit",
+        "loginZone": "Login Zone",
+        "officeZone": "Office Zone",
+        "checkIn": "Check In",
+        "checkOut": "Check Out"
+    }
 }

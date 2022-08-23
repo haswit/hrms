@@ -51,7 +51,7 @@ class AuthService {
     profile.loggedin = false;
   }
 
-  bioAuth(context) async {
+  bioAuth(cin, id, pwd, context) async {
     bool isAuthenticated = await AuthService.authenticateUser();
     if (isAuthenticated) {
       Future<bool> location = requestLocation();
@@ -63,16 +63,14 @@ class AuthService {
           MaterialPageRoute(builder: (context) => GpsAlert()),
         );
       } else {
-        MySharedPreferences.instance.setStringValue("logged_in", "true");
+        //MySharedPreferences.instance.setStringValue("logged_in", "true");
 
-        final Profile profile = Provider.of<Profile>(context, listen: false);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => MyHomePage()),
+        // );
 
-        profile.loggedin = true;
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyHomePage()),
-        );
+        AuthService().authUser(cin, id, pwd, context);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

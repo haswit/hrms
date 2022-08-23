@@ -1,7 +1,4 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/widgets/appbar.dart';
 import 'package:hrms_app/widgets/timeline.dart';
 
@@ -30,48 +27,48 @@ class _ActivitiesState extends State<Activities> {
 // Icon(Icons.photo),
 // Icon(Icons.mic),
 
-    HttpService().getAllSessions().then((value) {
-      var sosData = value;
+    //   HttpService().getAllSessions().then((value) {
+    //     var sosData = value;
 
-      print(sosData);
+    //     print(sosData);
 
-      for (var item in sosData) {
-        if (item['session'] == "IN") {
-          tempindicatorIcons.add(InIcon());
-          temptimelineItems.add(InCard(item));
-        } else {
-          tempindicatorIcons.add(OutIcon());
-          temptimelineItems.add(OutCard(item));
-        }
-      }
-      setState(() {
-        timelineItems = temptimelineItems;
-        indicatorIcons = tempindicatorIcons;
-      });
-    });
+    //     for (var item in sosData) {
+    //       if (item['session'] == "IN") {
+    //         tempindicatorIcons.add(InIcon());
+    //         temptimelineItems.add(InCard(item));
+    //       } else {
+    //         tempindicatorIcons.add(OutIcon());
+    //         temptimelineItems.add(OutCard(item));
+    //       }
+    //     }
+    //     setState(() {
+    //       timelineItems = temptimelineItems;
+    //       indicatorIcons = tempindicatorIcons;
+    //     });
+    //   });
   }
 
   SizedBox OutIcon() {
     return const SizedBox(
         width: 20,
         height: 20,
-        child: const Icon(
+        child: Icon(
           Icons.logout_rounded,
           color: Colors.red,
         ));
   }
 
-  SizedBox InIcon() {
+  SizedBox inIcon() {
     return const SizedBox(
         width: 20,
         height: 20,
-        child: const Icon(
+        child: Icon(
           Icons.login_rounded,
           color: Colors.green,
         ));
   }
 
-  Row InCard(Map<String, Object> item) {
+  Row inCard(Map<String, Object> item) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -89,12 +86,12 @@ class _ActivitiesState extends State<Activities> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: const [
                       Text(
                         "Lodded in",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const Text("12:40 PM")
+                      Text("12:40 PM")
                     ],
                   ),
                   Container(
@@ -141,12 +138,12 @@ class _ActivitiesState extends State<Activities> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: const [
                       Text(
                         "Lodded out",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      const Text("12:40 PM")
+                      Text("12:40 PM")
                     ],
                   ),
                   Container(
@@ -159,7 +156,7 @@ class _ActivitiesState extends State<Activities> {
                       width: 30,
                       height: 15,
                       child: Center(
-                        child: const Text(
+                        child: Text(
                           "OUT",
                           style: TextStyle(color: Colors.white),
                         ),

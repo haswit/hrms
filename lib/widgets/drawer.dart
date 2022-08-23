@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hrms_app/main.dart';
 import 'package:hrms_app/services/auth.dart';
 import 'package:hrms_app/views/settings_page.dart';
-import 'package:hrms_app/views/sos.dart';
 
 import '../views/login.dart';
 
@@ -47,22 +46,6 @@ class MyDrawer extends StatelessWidget {
                   Navigator.pop(context);
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => const Settings()));
-                },
-              ),
-              ListTile(
-                title: const Text(
-                  'Help',
-                  style: TextStyle(fontSize: 18.0, color: Colors.white),
-                ),
-                leading: const Icon(
-                  Icons.help,
-                  size: 20.0,
-                  color: Colors.white,
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const Sos()));
                 },
               ),
             ]),

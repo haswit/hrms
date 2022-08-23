@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:hrms_app/constants.dart';
 import 'package:hrms_app/services/my_shared_prederences.dart';
 import 'package:hrms_app/widgets/custom_button.dart';
 import 'package:hrms_app/widgets/custom_input.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
 import '../services/auth.dart';
 
@@ -21,25 +23,44 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   var cin = "";
   late final String email;
+  late SharedPreferences prefs;
+  String pwd = "";
+  String username = "";
+
   AuthService authProvider = AuthService();
 
   var _passwordVisible = false;
+
+  authWithBio() {
+    authProvider.bioAuth(cin, username, pwd, context);
+  }
+
+  initSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    var cin = prefs.getString("cin");
+    if (cin.toString().isNotEmpty) {
+      print("-------------------$cin");
+      var username = prefs.getString("username");
+      var pwd = prefs.getString("pwd");
+
+      setState(() {
+        cin = cin;
+        username = username.toString();
+        pwd = pwd;
+        authProvider.bioAuth(cin, username, pwd, context);
+
+        _cinController.text = cin!;
+        _idController.text = username!;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _passwordVisible = false;
 
-    MySharedPreferences.instance.getStringValue("cin").then((value) {
-      if (value != "") {
-        setState(() {
-          cin = value;
-
-          authProvider.bioAuth(context);
-          _cinController.text = cin;
-        });
-      }
-    });
+    initSharedPrefs();
   }
 
   @override
@@ -59,31 +80,46 @@ class _LoginState extends State<Login> {
           children: [
             Container(
               height: MediaQuery.of(context).size.height,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/media/bg2.jpg"),
-                  fit: BoxFit.cover,
-                ),
-              ),
               child: SingleChildScrollView(
                 child: Form(
                   key: _formKey,
                   child: Padding(
                     padding:
-                        const EdgeInsets.only(top: 150, right: 20, left: 20),
+                        const EdgeInsets.only(top: 60, right: 20, left: 20),
                     child: SizedBox(
                         width: 400,
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Padding(
+                              Center(
+                                child: SizedBox(
+                                    width: 80,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color.fromARGB(
+                                                  255, 182, 181, 194),
+                                              blurRadius: 3.0,
+                                            ),
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(100)),
+                                      child: Image.asset(
+                                          "assets/media/logo-main.png"),
+                                    )),
+                              ),
+                              SizedBox(
+                                height: 40,
+                              ),
+                              Padding(
                                 padding:
                                     EdgeInsets.only(left: 18.0, right: 18.0),
                                 child: Text(
                                   'Sign In',
                                   style: TextStyle(
-                                    color: Colors.blue,
+                                    color: ConstantStrings.kPrimaryColor,
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Calistoga',
@@ -102,7 +138,8 @@ class _LoginState extends State<Login> {
                                         child: Container(
                                           padding: const EdgeInsets.all(25),
                                           decoration: BoxDecoration(
-                                              color: Colors.grey.shade200
+                                              color: ConstantStrings
+                                                  .kPrimaryColor
                                                   .withOpacity(0.3)),
                                           child: Column(
                                             children: [
@@ -110,13 +147,14 @@ class _LoginState extends State<Login> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  const Padding(
+                                                  Padding(
                                                     padding: EdgeInsets.only(
                                                         bottom: 8.0),
                                                     child: Text(
                                                       "CIN Number",
                                                       style: TextStyle(
-                                                          color: Colors.white,
+                                                          color: ConstantStrings
+                                                              .kPrimaryColor,
                                                           fontSize: 20,
                                                           fontWeight:
                                                               FontWeight.bold),
@@ -142,13 +180,14 @@ class _LoginState extends State<Login> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    const Padding(
+                                                    Padding(
                                                       padding: EdgeInsets.only(
                                                           bottom: 8.0),
                                                       child: Text(
                                                         "ID",
                                                         style: TextStyle(
-                                                            color: Colors.white,
+                                                            color: ConstantStrings
+                                                                .kPrimaryColor,
                                                             fontSize: 20,
                                                             fontWeight:
                                                                 FontWeight
@@ -173,13 +212,14 @@ class _LoginState extends State<Login> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  const Padding(
+                                                  Padding(
                                                     padding: EdgeInsets.only(
                                                         bottom: 8.0),
                                                     child: Text(
                                                       "Password",
                                                       style: TextStyle(
-                                                          color: Colors.white,
+                                                          color: ConstantStrings
+                                                              .kPrimaryColor,
                                                           fontSize: 20,
                                                           fontWeight:
                                                               FontWeight.bold),
@@ -230,9 +270,7 @@ class _LoginState extends State<Login> {
                                                     child: CustomButton(
                                                         text: "Continue",
                                                         onclickFunction: () {
-                                                          print(
-                                                              "=================CLICKED=========================");
-                                                          authProvider.authUser(
+                                                          AuthService().authUser(
                                                               _cinController
                                                                   .text,
                                                               _idController
@@ -255,8 +293,7 @@ class _LoginState extends State<Login> {
                                                               .width,
                                                       child: TextButton(
                                                         onPressed: () {
-                                                          authProvider
-                                                              .bioAuth(context);
+                                                          authWithBio();
                                                         },
                                                         style: TextButton
                                                             .styleFrom(
