@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:hrms_app/constants.dart';
 import 'package:hrms_app/services/http_service.dart';
 import 'package:hrms_app/widgets/appbar.dart';
 import 'package:hrms_app/widgets/custom_button.dart';
@@ -106,38 +107,29 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
           child: SingleChildScrollView(
         child: Column(
           children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                    controller: subjectController,
-                    decoration: const InputDecoration(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                  controller: subjectController,
+                  decoration: InputDecoration(
                       prefix: null,
                       hintText: "Enter Subject",
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                    )),
-              ),
+                      hintStyle:
+                          TextStyle(color: ConstantStrings.kPrimaryColor))),
             ),
             const SizedBox(
               height: 30,
             ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                    controller: messageController,
-                    minLines: 5,
-                    maxLines: 10,
-                    decoration: const InputDecoration(
-                      focusedBorder: InputBorder.none,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                  controller: messageController,
+                  minLines: 5,
+                  maxLines: 10,
+                  decoration: InputDecoration(
                       hintText: "Enter Message",
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(4)),
-                      ),
-                    )),
-              ),
+                      hintStyle:
+                          TextStyle(color: ConstantStrings.kPrimaryColor))),
             ),
             const SizedBox(
               height: 30,
@@ -153,14 +145,17 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.camera,
                                 size: 30,
+                                color: ConstantStrings.kPrimaryColor,
                               ),
                               const SizedBox(
                                 width: 15,
                               ),
-                              Text("Capture Image")
+                              Text("Capture Image",
+                                  style: TextStyle(
+                                      color: ConstantStrings.kPrimaryColor))
                             ],
                           ),
                         ),
@@ -184,7 +179,7 @@ class _SubmitIncedentState extends State<SubmitIncedent> {
                               },
                               child: Row(
                                 children: [
-                                  const Icon(Icons.replay_outlined),
+                                  const Icon(Icons.replay),
                                   const Text("Retake"),
                                 ],
                               )),

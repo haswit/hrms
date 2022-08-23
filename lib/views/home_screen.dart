@@ -86,12 +86,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     print("-------------${context.locale}");
     return Scaffold(
+      backgroundColor: Colors.white,
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Attendance()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const Attendance()));
         },
         child: Container(
           width: double.infinity,
@@ -143,58 +144,64 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               )))
           : SingleChildScrollView(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: ConstantStrings.kPrimaryColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
-                    bottomLeft: Radius.circular(40),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 25,
                   ),
-                ),
-                child: WillPopScope(
-                  onWillPop: () async {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text("Are your sure?"),
-                        content: const Text("you want to close the app"),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              SystemNavigator.pop();
-                            },
-                            child: const Text("okay"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text("Cancel"),
-                          ),
-                        ],
+                  Container(
+                    decoration: BoxDecoration(
+                      color: ConstantStrings.kPrimaryColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
                       ),
-                    ); // Returning true allows the pop to happen, returning false prevents it.
+                    ),
+                    child: WillPopScope(
+                      onWillPop: () async {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text("Are your sure?"),
+                            content: const Text("you want to close the app"),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  SystemNavigator.pop();
+                                },
+                                child: const Text("okay"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Cancel"),
+                              ),
+                            ],
+                          ),
+                        ); // Returning true allows the pop to happen, returning false prevents it.
 
-                    return true;
-                  },
-                  child: Container(
-                    color: ConstantStrings.lightGrey,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.85,
-                      child: PageView.builder(
-                        itemCount: pages.length,
-                        scrollDirection: Axis.horizontal,
-                        controller: _pageController,
-                        itemBuilder: (context, itemIndex) {
-                          return pages[itemIndex];
-                        },
+                        return true;
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        color: ConstantStrings.lightGrey,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * 0.85,
+                          child: PageView.builder(
+                            itemCount: pages.length,
+                            scrollDirection: Axis.horizontal,
+                            controller: _pageController,
+                            itemBuilder: (context, itemIndex) {
+                              return pages[itemIndex];
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
     );
@@ -332,72 +339,101 @@ class _LandingScreenState extends State<LandingScreen> {
       child: Container(
         height: MediaQuery.of(context).size.height,
         child: Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(
-                height: 40,
+              Container(
+                height: 50,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    border:
+                        Border.all(color: ConstantStrings.kPrimaryColorLite)),
               ),
-              SizedBox(
-                  height: 150,
-                  width: double.infinity,
-                  child: Container(
+              Sized30(),
+              SiteCard(context),
+              Sized30(),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
                     decoration: BoxDecoration(
-                        color: ConstantStrings.kPrimaryColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: ConstantStrings.kPrimaryColorLite,
-                            blurRadius: 5.0,
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "My site",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w200),
-                                ),
-                                Icon(
-                                  Icons.pin_drop_rounded,
-                                  color: Colors.white,
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
-                            child: Text(
-                                context.locale.toString() == "en_US"
-                                    ? siteName
-                                    : siteNameAr,
-                                style: const TextStyle(
-                                    fontSize: 22.0,
-                                    fontWeight: FontWeight.w300,
-                                    color: const Color.fromARGB(
-                                        255, 255, 255, 255))),
-                          ),
-                        ]),
-                  )),
-              const SizedBox(
-                height: 30,
-              ),
+                      border: Border(
+                          bottom: BorderSide(
+                              width: 1.5, color: Colors.purpleAccent)),
+                    ),
+                    child: Text(
+                      "Recent Activities",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 22,
+                          color: ConstantStrings.kPrimaryColorLite),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
         ),
       ),
     );
+  }
+
+  SizedBox Sized30() {
+    return const SizedBox(
+      height: 30,
+    );
+  }
+
+  SizedBox SiteCard(BuildContext context) {
+    return SizedBox(
+        height: 150,
+        width: double.infinity,
+        child: Container(
+          decoration: BoxDecoration(
+              color: ConstantStrings.kPrimaryColor,
+              boxShadow: [
+                BoxShadow(
+                  color: ConstantStrings.kPrimaryColorLite,
+                  blurRadius: 5.0,
+                ),
+              ],
+              borderRadius: BorderRadius.circular(10)),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "My site",
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w200),
+                  ),
+                  const Icon(
+                    Icons.pin_drop_rounded,
+                    color: Colors.white,
+                  )
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
+              child: Text(
+                  context.locale.toString() == "en_US" ? siteName : siteNameAr,
+                  style: const TextStyle(
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.w300,
+                      color: const Color.fromARGB(255, 255, 255, 255))),
+            ),
+          ]),
+        ));
   }
 }
 

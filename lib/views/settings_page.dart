@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hrms_app/constants.dart';
 import 'package:hrms_app/main.dart';
 import 'package:hrms_app/services/my_shared_prederences.dart';
 import 'package:hrms_app/widgets/custom_button.dart';
@@ -49,7 +50,6 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
       child: SingleChildScrollView(
         child: SizedBox(
             width: double.infinity,
@@ -59,24 +59,24 @@ class _SettingsState extends State<Settings> {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.03,
                 ),
-                const Text(
+                Text(
                   "Choose Language",
                   style: TextStyle(
-                      color: Colors.blueGrey,
+                      color: ConstantStrings.kPrimaryColorLite,
                       fontSize: 28,
                       fontFamily: 'Calistoga'),
                 ),
-                const Text(
+                Text(
                   "you want to use the app in",
                   style: TextStyle(
-                      color: Colors.blueGrey,
+                      color: ConstantStrings.kPrimaryColorLite,
                       fontSize: 15,
                       fontFamily: 'Calistoga'),
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.01,
                 ),
-                Image.asset("assets/media/world.png"),
+                Image.asset("assets/media/world-t.png"),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -223,7 +223,7 @@ class _SettingsState extends State<Settings> {
                           );
                         }
                       },
-                      text: "Continue"),
+                      text: "Save"),
                 ),
               ],
             )),
