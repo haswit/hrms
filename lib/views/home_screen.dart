@@ -290,7 +290,9 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   String siteName = "";
   String siteNameAr = "";
+  List<dynamic> items = [];
   late SharedPreferences pref;
+  bool isLoaded = false;
 
   initSharedPrefs() async {
     pref = await SharedPreferences.getInstance();
@@ -301,11 +303,35 @@ class _LandingScreenState extends State<LandingScreen> {
     });
   }
 
+  fetchData() async {
+    var recentActivity = await HttpService().getcheckInEmployee();
+    print("--------data---list------------");
+    print(recentActivity);
+    setState(() {
+      items = recentActivity['items'];
+      isLoaded = true;
+    });
+  }
+
+  getFormatDate(String d) {
+    var date = DateTime.parse(d);
+    return DateFormat("y-M-d").format(date);
+  }
+
+  getFormatTime(String d, String t) {
+    d = d.toString().split("T")[0];
+
+    print(d);
+    var date = DateTime.parse("$d $t");
+    return DateFormat("H:m").format(date);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     initSharedPrefs();
+    fetchData();
   }
 
   @override
@@ -319,14 +345,6 @@ class _LandingScreenState extends State<LandingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 50,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    border:
-                        Border.all(color: ConstantStrings.kPrimaryColorLite)),
-              ),
-              Sized30(),
               SiteCard(context),
               Sized30(),
               Column(
@@ -348,6 +366,85 @@ class _LandingScreenState extends State<LandingScreen> {
                           color: ConstantStrings.kPrimaryColorLite),
                     ),
                   ),
+                  Container(
+                    child: isLoaded == false
+                        ? Container(
+                            height: 200,
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(18.0),
+                              child: CircularProgressIndicator(),
+                            )),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: List.generate(
+                                    items.length,
+                                    (index) => SizedBox(
+                                          height: 70,
+                                          child: Card(
+                                            elevation: 4,
+                                            child: Row(children: [
+                                              Container(
+                                                color: ConstantStrings
+                                                    .kPrimaryColorLite,
+                                                width: 5,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 15),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    Text(
+                                                      "SiteCode: ${items[index]['siteCode']}",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.6,
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                              "${getFormatDate(items[index]['date'])}"),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                  "${getFormatTime(items[index]['date'], items[index]['inTime'])} to"),
+                                                              Text(
+                                                                  " ${getFormatTime(items[index]['date'], items[index]['outTime'])}"),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ]),
+                                          ),
+                                        )),
+                              ),
+                            ),
+                          ),
+                  )
                 ],
               )
             ],

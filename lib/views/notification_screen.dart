@@ -8,7 +8,7 @@ class NotificationScreen extends StatefulWidget {
   _NotificationScreenState createState() => _NotificationScreenState();
 }
 
-var NotificationsData = [1, 2, 3, 4, 5];
+var NotificationsData = [];
 
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
@@ -17,13 +17,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
       width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.8,
       padding: EdgeInsets.all(20),
-      child: ListView.builder(
-        itemCount: NotificationsData.length,
-        itemBuilder: (context, index) {
-          return Dismissible(
-              key: Key(index.toString()), child: NotificationCard());
-        },
-      ),
+      child: NotificationsData.length == 0
+          ? SizedBox(
+              child: Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.notifications_off_outlined),
+                  Text("No data")
+                ],
+              )),
+            )
+          : ListView.builder(
+              itemCount: NotificationsData.length,
+              itemBuilder: (context, index) {
+                return Dismissible(
+                    key: Key(index.toString()), child: NotificationCard());
+              },
+            ),
     );
   }
 }

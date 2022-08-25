@@ -417,23 +417,21 @@ class LoginButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                     shadowColor: Colors.green,
                     primary: const Color.fromARGB(221, 27, 202, 65)),
-                onPressed:
-                    // inLoginZone
-                    //     ? !alreadyIn
-                    //         ?
-                    () async {
-                  await availableCameras().then((value) => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CameraPage(
-                          session: "IN",
-                          cameras: value,
-                        ),
-                      )));
-                }
-                //     : null
-                // : null
-                ,
+                onPressed: inLoginZone
+                    ? !alreadyIn
+                        ? () async {
+                            await availableCameras()
+                                .then((value) => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CameraPage(
+                                        session: "IN",
+                                        cameras: value,
+                                      ),
+                                    )));
+                          }
+                        : null
+                    : null,
                 child: Text(
                   "AppStrings.checkIn".tr(),
                   style: TextStyle(fontSize: 25),
@@ -447,21 +445,23 @@ class LoginButtons extends StatelessWidget {
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     primary: const Color.fromARGB(226, 244, 67, 54)),
-                onPressed: inLoginZone
-                    ? !alreadyIn
-                        ? () async {
-                            // await availableCameras()
-                            //     .then((value) => Navigator.push(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //           builder: (context) => CameraPage(
-                            //             session: "OUT",
-                            //             cameras: value,
-                            //           ),
-                            //         )));
-                          }
-                        : null
-                    : null,
+                onPressed:
+                    // inLoginZone
+                    //     ? !alreadyIn
+                    // ?
+                    () async {
+                  await availableCameras().then((value) => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CameraPage(
+                          session: "OUT",
+                          cameras: value,
+                        ),
+                      )));
+                }
+                //     : null
+                // : null
+                ,
                 child: Text("AppStrings.checkOut".tr(),
                     style: TextStyle(fontSize: 25)))),
       ]),

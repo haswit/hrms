@@ -105,9 +105,23 @@ class HttpService {
   static submitSession(
       context, String loginSession, String time, String date, image) async {
     var sessn = loginSession == "IN" ? "checkInEmpoyee" : "checkOutEmpoyee";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? inTime = "";
+
+    var outTime = "";
+    if (loginSession == "IN") {
+      inTime = time;
+      prefs.setString("inTime", time);
+      outTime = time;
+    } else {
+      outTime = time;
+      inTime = prefs.getString("inTime");
+    }
+
+    print("$inTime   $outTime $date");
     String url = "${ConstantStrings.baseUrl}/${sessn}";
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token").toString();
 
     var id = prefs.getString("id");
@@ -116,13 +130,13 @@ class HttpService {
     request.fields.addAll({
       "id": id.toString(),
       "employeeId": "",
-      "name": "string",
-      "date": "2022-08-10",
-      "inTime": loginSession == "IN" ? date : "",
-      "outTime": loginSession != "IN" ? date : "",
+      "name": "-",
+      "date": date,
+      "inTime": inTime.toString(),
+      "outTime": outTime,
       "attnFlag": loginSession,
       "shiftId": "0",
-      "siteCode": "string",
+      "siteCode": "-",
       "shiftNumber": "0"
     });
     final headers = {
@@ -130,7 +144,6 @@ class HttpService {
       'Authorization': 'Bearer $token',
     };
 
-    request.headers.addAll(headers);
     request.files.add(
       await http.MultipartFile.fromPath(
         'images',
@@ -138,7 +151,11 @@ class HttpService {
         contentType: MediaType('application', 'jpeg'),
       ),
     );
+
+    request.headers.addAll(headers);
+
     http.StreamedResponse r = await request.send();
+    print(r.statusCode);
 
     if (r.statusCode == 200) {
       await EasyLoading.showSuccess("Submitted Successfully");
@@ -147,7 +164,6 @@ class HttpService {
           context, MaterialPageRoute(builder: (context) => MyHomePage()));
     } else {
       await EasyLoading.showError("Something went wrong!");
-      print(r.statusCode);
     }
   }
 
@@ -173,14 +189,12 @@ class HttpService {
         encoding: encoding,
       );
 
-      if (response.statusCode == 200) {
-        MySharedPreferences.instance.setStringValue("logged_in", "");
+      MySharedPreferences.instance.setStringValue("logged_in", "");
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Login()),
-        );
-      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+      );
 
       print(response.statusCode);
       print(response.body);
@@ -299,5 +313,23 @@ class HttpService {
     } else {
       return value;
     }
+  }
+
+  Future<dynamic> getcheckInEmployee() async {
+    String url =
+        "${ConstantStrings.baseUrl}/checkInEmpoyee?page=0&PageCount=20&OrderBy=id";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(url);
+    String token = prefs.getString("token").toString();
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse(url), headers: headers);
+    print(response.statusCode);
+    var responseData = json.decode(response.body);
+
+    return responseData;
   }
 }
